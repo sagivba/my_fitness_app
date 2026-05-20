@@ -36,6 +36,7 @@ class GarminGpxWorkoutData:
     start_timestamp: str
     end_timestamp: str
     workout_type: str
+    duration_seconds: float
     duration_minutes: int
     distance_meters: float
     point_count: int
@@ -43,6 +44,8 @@ class GarminGpxWorkoutData:
     elevation_min_meters: float | None
     elevation_max_meters: float | None
     elevation_gain_meters: float | None
+    elevation_loss_meters: float | None
+    external_activity_id: str | None
     missing_optional_fields: list[str]
 
 
@@ -73,7 +76,9 @@ def parse_gpx_file(file_path: str | Path) -> GarminGpxWorkoutData:
     all_points: list[GpxTrackPoint] = []
     distance_meters = 0.0
     elevation_gain_meters = 0.0
+    elevation_loss_meters = 0.0
     has_elevation_gain = False
+    has_elevation_loss = False
 
     for track in tracks:
         for segment in _children(track, "trkseg"):
@@ -82,9 +87,16 @@ def parse_gpx_file(file_path: str | Path) -> GarminGpxWorkoutData:
             point_count += len(segment_points)
             all_points.extend(segment_points)
             distance_meters += _segment_distance(segment_points)
-            segment_gain, has_segment_gain = _segment_elevation_gain(segment_points)
+            (
+                segment_gain,
+                segment_loss,
+                has_segment_gain,
+                has_segment_loss,
+            ) = _segment_elevation_change(segment_points)
             elevation_gain_meters += segment_gain
+            elevation_loss_meters += segment_loss
             has_elevation_gain = has_elevation_gain or has_segment_gain
+            has_elevation_loss = has_elevation_loss or has_segment_loss
 
     if segment_count == 0:
         raise GarminGpxImportError("GPX track must include at least one segment.")
@@ -116,6 +128,7 @@ def parse_gpx_file(file_path: str | Path) -> GarminGpxWorkoutData:
         start_timestamp=start_point.timestamp_text or start_point.timestamp.isoformat(),
         end_timestamp=end_point.timestamp_text or end_point.timestamp.isoformat(),
         workout_type=workout_type,
+        duration_seconds=duration_seconds,
         duration_minutes=max(1, round(duration_seconds / 60)),
         distance_meters=distance_meters,
         point_count=point_count,
@@ -123,6 +136,8 @@ def parse_gpx_file(file_path: str | Path) -> GarminGpxWorkoutData:
         elevation_min_meters=min(elevations) if elevations else None,
         elevation_max_meters=max(elevations) if elevations else None,
         elevation_gain_meters=elevation_gain_meters if has_elevation_gain else None,
+        elevation_loss_meters=elevation_loss_meters if has_elevation_loss else None,
+        external_activity_id=start_point.timestamp_text or start_point.timestamp.isoformat(),
         missing_optional_fields=missing_optional_fields,
     )
 
@@ -161,7 +176,7 @@ def import_garmin_gpx(
         database_path,
         SOURCE,
         workout_data.workout_date,
-        workout_data.start_time,
+        workout_data.start_timestamp,
         workout_data.workout_type,
         workout_data.duration_minutes,
         workout_data.distance_meters,
@@ -184,6 +199,13 @@ def import_garmin_gpx(
             duration_minutes=workout_data.duration_minutes,
             notes=_build_workout_notes(workout_data),
             source=SOURCE,
+            start_time=workout_data.start_timestamp,
+            end_time=workout_data.end_timestamp,
+            duration_seconds=workout_data.duration_seconds,
+            distance_meters=workout_data.distance_meters,
+            elevation_gain_meters=workout_data.elevation_gain_meters,
+            elevation_loss_meters=workout_data.elevation_loss_meters,
+            external_activity_id=workout_data.external_activity_id,
         ),
     )
 
@@ -241,6 +263,10 @@ def _build_workout_notes(workout_data: GarminGpxWorkoutData) -> str:
         notes.append(f"Elevation max meters: {workout_data.elevation_max_meters:.2f}")
     if workout_data.elevation_gain_meters is not None:
         notes.append(f"Elevation gain meters: {workout_data.elevation_gain_meters:.2f}")
+    if workout_data.elevation_loss_meters is not None:
+        notes.append(f"Elevation loss meters: {workout_data.elevation_loss_meters:.2f}")
+    if workout_data.external_activity_id is not None:
+        notes.append(f"External activity ID: {workout_data.external_activity_id}")
     if workout_data.missing_optional_fields:
         notes.append("Missing optional fields: " + ", ".join(workout_data.missing_optional_fields))
     notes.append("Source metadata: GPX track")
@@ -272,9 +298,11 @@ def _segment_distance(points: list[GpxTrackPoint]) -> float:
     return distance_meters
 
 
-def _segment_elevation_gain(points: list[GpxTrackPoint]) -> tuple[float, bool]:
+def _segment_elevation_change(points: list[GpxTrackPoint]) -> tuple[float, float, bool, bool]:
     elevation_gain = 0.0
+    elevation_loss = 0.0
     has_elevation_gain = False
+    has_elevation_loss = False
     previous_elevation: float | None = None
 
     for point in points:
@@ -285,9 +313,12 @@ def _segment_elevation_gain(points: list[GpxTrackPoint]) -> tuple[float, bool]:
             if delta > 0:
                 elevation_gain += delta
                 has_elevation_gain = True
+            elif delta < 0:
+                elevation_loss += abs(delta)
+                has_elevation_loss = True
         previous_elevation = point.elevation_meters
 
-    return elevation_gain, has_elevation_gain
+    return elevation_gain, elevation_loss, has_elevation_gain, has_elevation_loss
 
 
 def _haversine_distance(

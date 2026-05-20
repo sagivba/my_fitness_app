@@ -1,0 +1,2 @@
+activity_date,start_time,end_time,activity_type,duration_minutes,distance_meters,calories,average_heart_rate,max_heart_rate,external_activity_id,notes
+2026-05-20,06:45,07:25,Running,40,6200.5,410,146,173,csv-activity-1,Structured metrics row

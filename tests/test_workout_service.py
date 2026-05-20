@@ -50,6 +50,9 @@ class TestWorkoutService(TestCase):
 
         self.assertIsNone(created.duration_minutes)
         self.assertIsNone(created.notes)
+        self.assertEqual(created.source, "manual")
+        self.assertIsNone(created.start_time)
+        self.assertIsNone(created.distance_meters)
 
     def test_create_workout_rejects_missing_required_fields(self):
         with self.assertRaises(WorkoutValidationError) as context:

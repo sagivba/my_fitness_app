@@ -11,8 +11,9 @@ minimal SQLite persistence foundation with basic workout, sleep, daily log, manu
 meal data entry, raw activity file storage, and Garmin CSV/TCX/GPX import paths.
 
 The Garmin import foundation stores raw files and can import documented CSV, TCX, and
-GPX formats into workout records. It does not parse FIT files and does not create
-derived metrics.
+GPX formats into workout records. Supported Garmin metadata is persisted in structured
+workout fields where possible and powers a small workout metrics dashboard. The app
+does not parse FIT files and does not provide advanced analytics.
 
 ## Initial scope
 
@@ -143,6 +144,12 @@ http://127.0.0.1:5000/workouts/
 http://127.0.0.1:5000/workouts/new
 ```
 
+Workout metrics dashboard:
+
+```text
+http://127.0.0.1:5000/dashboard/
+```
+
 Sleep pages:
 
 ```text
@@ -189,8 +196,8 @@ Garmin import formats and limitations are documented in:
 docs/garmin-imports.md
 ```
 
-FIT parsing, metric creation, Garmin Connect integration, dashboard metrics, and
-analytics remain future scope.
+FIT parsing, Garmin Connect integration, charts, and advanced analytics remain future
+scope.
 
 ## SQLite persistence
 
@@ -227,6 +234,25 @@ The initial schema creates these MVP tables:
 - `sleep_log`
 - `meal`
 - `imported_file`
+
+The workout table includes nullable structured metric fields used by Garmin imports
+and the mini dashboard:
+
+- `start_time`
+- `end_time`
+- `duration_seconds`
+- `distance_meters`
+- `calories`
+- `average_heart_rate`
+- `max_heart_rate`
+- `elevation_gain_meters`
+- `elevation_loss_meters`
+- `external_activity_id`
+
+Existing SQLite databases are updated during startup by simple idempotent
+compatibility checks that add missing nullable columns. The project does not use a
+migration framework. Workout notes remain human-readable summaries and are not used as
+the source for dashboard metrics.
 
 You can also initialize the configured database directly in Docker:
 

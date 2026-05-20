@@ -48,11 +48,19 @@ class TestGarminGpxImportService(TestCase):
         self.assertEqual(workouts[0].workout_type, "Walking")
         self.assertEqual(workouts[0].duration_minutes, 30)
         self.assertEqual(workouts[0].source, "garmin_gpx")
+        self.assertEqual(workouts[0].start_time, "2026-05-18T07:30:00Z")
+        self.assertEqual(workouts[0].end_time, "2026-05-18T08:00:00Z")
+        self.assertEqual(workouts[0].duration_seconds, 1800.0)
+        self.assertGreater(workouts[0].distance_meters, 0)
+        self.assertEqual(workouts[0].elevation_gain_meters, 4.0)
+        self.assertEqual(workouts[0].elevation_loss_meters, 2.0)
+        self.assertEqual(workouts[0].external_activity_id, "2026-05-18T07:30:00Z")
         self.assertIn("Garmin GPX start time: 07:30", workouts[0].notes)
         self.assertIn("Distance meters:", workouts[0].notes)
         self.assertIn("Point count: 3", workouts[0].notes)
         self.assertIn("Segment count: 1", workouts[0].notes)
         self.assertIn("Elevation gain meters: 4.00", workouts[0].notes)
+        self.assertIn("Elevation loss meters: 2.00", workouts[0].notes)
 
     def test_gpx_multiple_track_segments_imports_segment_metadata(self):
         imported_file = self._create_imported_file_from_fixture("garmin_multi_segment.gpx")
@@ -66,6 +74,8 @@ class TestGarminGpxImportService(TestCase):
         self.assertEqual(len(workouts), 1)
         self.assertEqual(workouts[0].workout_type, "Cycling")
         self.assertEqual(workouts[0].duration_minutes, 30)
+        self.assertIsNotNone(workouts[0].distance_meters)
+        self.assertIsNotNone(workouts[0].elevation_gain_meters)
         self.assertIn("Point count: 4", workouts[0].notes)
         self.assertIn("Segment count: 2", workouts[0].notes)
 
