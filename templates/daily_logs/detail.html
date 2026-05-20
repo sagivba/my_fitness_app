@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <title>יומן יומי {{ daily_log.log_date }}</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <main class="container">
+    <h1>יומן יומי {{ daily_log.log_date }}</h1>
+    <p><a href="/daily-logs/">חזרה ליומן היומי</a></p>
+
+    <dl>
+      <dt>תאריך</dt>
+      <dd>{{ daily_log.log_date }}</dd>
+
+      {% if daily_log.body_weight_kg %}
+        <dt>משקל</dt>
+        <dd>{{ daily_log.body_weight_kg }} ק"ג</dd>
+      {% endif %}
+
+      {% if daily_log.mood %}
+        <dt>מצב רוח</dt>
+        <dd>{{ daily_log.mood }}</dd>
+      {% endif %}
+
+      {% if daily_log.energy_level %}
+        <dt>רמת אנרגיה</dt>
+        <dd>{{ daily_log.energy_level }}</dd>
+      {% endif %}
+
+      {% if daily_log.notes %}
+        <dt>הערות</dt>
+        <dd>{{ daily_log.notes }}</dd>
+      {% endif %}
+    </dl>
+  </main>
+</body>
+</html>
