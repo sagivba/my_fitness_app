@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <title>יומן יומי</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <main class="container">
+    <h1>יומן יומי</h1>
+    <p><a href="/">דף הבית</a></p>
+    <p><a href="/daily-logs/new">הוספת רשומה יומית</a></p>
+
+    {% if daily_logs %}
+      <ul>
+        {% for daily_log in daily_logs %}
+          <li>
+            <a href="/daily-logs/{{ daily_log.id }}">
+              {{ daily_log.log_date }}
+            </a>
+            {% if daily_log.mood %}
+              <span>{{ daily_log.mood }}</span>
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>עדיין אין רשומות יומיות שמורות.</p>
+    {% endif %}
+  </main>
+</body>
+</html>
