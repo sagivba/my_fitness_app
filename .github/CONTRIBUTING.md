@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This repository is an AI-friendly Python project template.
+This repository is an Personal fitness tracking application.
 
 Keep it simple, readable, reviewable, and easy for both humans and AI agents to understand.
 

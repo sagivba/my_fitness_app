@@ -10,15 +10,15 @@ routes -> services -> model
             utils
 ```
 
-## src/my_python_project_template/app.py
+## src/my_fitness_app/app.py
 
 Creates and configures the Flask application.
 
-## src/my_python_project_template/config.py
+## src/my_fitness_app/config.py
 
 Loads configuration from environment variables.
 
-## src/my_python_project_template/routes
+## src/my_fitness_app/routes
 
 HTTP boundary.
 
@@ -30,17 +30,17 @@ Route handlers should:
 
 Route handlers should not contain business logic.
 
-## src/my_python_project_template/services
+## src/my_fitness_app/services
 
 Business logic.
 
 Services should be easy to test with unittest.
 
-## src/my_python_project_template/model
+## src/my_fitness_app/model
 
 Domain models, data structures, and model-facing code.
 
-## src/my_python_project_template/utils
+## src/my_fitness_app/utils
 
 Small generic utilities.
 

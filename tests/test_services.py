@@ -1,6 +1,6 @@
 import unittest
 
-from my_python_project_template.services.example_service import get_health_status, get_welcome_message
+from my_fitness_app.services.example_service import get_health_status, get_welcome_message
 
 
 class TestExampleService(unittest.TestCase):

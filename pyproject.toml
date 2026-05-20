@@ -1,7 +1,7 @@
 [project]
-name = "my-python-project-template"
+name = "my-fitness-app"
 version = "0.1.0"
-description = "AI-friendly Python project template"
+description = "Personal fitness tracking application"
 requires-python = ">=3.12"
 dependencies = [
   "Flask>=3.0,<4.0",

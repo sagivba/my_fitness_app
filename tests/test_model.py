@@ -1,6 +1,6 @@
 import unittest
 
-from my_python_project_template.model.example_model import HealthStatus
+from my_fitness_app.model.example_model import HealthStatus
 
 
 class TestHealthStatus(unittest.TestCase):
