@@ -4,6 +4,7 @@ from my_fitness_app.config import AppConfig
 from my_fitness_app.model.database import initialize_database
 from my_fitness_app.routes.api import api_bp
 from my_fitness_app.routes.daily_logs import daily_logs_bp
+from my_fitness_app.routes.meals import meals_bp
 from my_fitness_app.routes.sleep import sleep_bp
 from my_fitness_app.routes.web import web_bp
 from my_fitness_app.routes.workouts import workouts_bp
@@ -26,6 +27,7 @@ def create_app(config: AppConfig | None = None) -> Flask:
     app.register_blueprint(workouts_bp)
     app.register_blueprint(sleep_bp)
     app.register_blueprint(daily_logs_bp)
+    app.register_blueprint(meals_bp)
 
     return app
 

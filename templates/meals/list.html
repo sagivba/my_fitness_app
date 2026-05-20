@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <title>ארוחות</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <main class="container">
+    <h1>ארוחות</h1>
+    <p><a href="/">דף הבית</a></p>
+    <p><a href="/meals/new">הוספת ארוחה</a></p>
+
+    {% if meals %}
+      <ul>
+        {% for meal in meals %}
+          <li>
+            <a href="/meals/{{ meal.id }}">
+              {{ meal.meal_date }} - {{ meal.meal_type }}
+            </a>
+            {% if meal.calories %}
+              <span>{{ meal.calories }} קלוריות</span>
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>עדיין אין ארוחות שמורות.</p>
+    {% endif %}
+  </main>
+</body>
+</html>

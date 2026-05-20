@@ -7,7 +7,8 @@ The application is intended to collect and organize personal fitness, sleep, nut
 ## Current status
 
 This repository currently contains the initialized Flask foundation for the app and a
-minimal SQLite persistence foundation with basic workout, sleep, and daily log data entry.
+minimal SQLite persistence foundation with basic workout, sleep, daily log, and manual
+meal data entry.
 
 The next development phase can build manual data collection features on top of the
 database foundation.
@@ -154,6 +155,16 @@ Daily log pages:
 http://127.0.0.1:5000/daily-logs/
 http://127.0.0.1:5000/daily-logs/new
 ```
+
+Meal pages:
+
+```text
+http://127.0.0.1:5000/meals/
+http://127.0.0.1:5000/meals/new
+```
+
+Manual meal logging uses only the current SQLite `meal` table fields. AI nutrition
+analysis, meal photo upload, `meal_time`, and `recipe_url` are future scope.
 
 ## SQLite persistence
 
