@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <title>שינה</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <main class="container">
+    <h1>שינה</h1>
+    <p><a href="/">דף הבית</a></p>
+    <p><a href="/sleep/new">הוספת שינה</a></p>
+
+    {% if sleep_logs %}
+      <ul>
+        {% for sleep_log in sleep_logs %}
+          <li>
+            <a href="/sleep/{{ sleep_log.id }}">
+              {{ sleep_log.sleep_date }}
+            </a>
+            {% if sleep_log.duration_minutes %}
+              <span>{{ sleep_log.duration_minutes }} דקות</span>
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>עדיין אין רשומות שינה שמורות.</p>
+    {% endif %}
+  </main>
+</body>
+</html>

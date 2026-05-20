@@ -3,6 +3,7 @@ from flask import Flask
 from my_fitness_app.config import AppConfig
 from my_fitness_app.model.database import initialize_database
 from my_fitness_app.routes.api import api_bp
+from my_fitness_app.routes.sleep import sleep_bp
 from my_fitness_app.routes.web import web_bp
 from my_fitness_app.routes.workouts import workouts_bp
 
@@ -22,6 +23,7 @@ def create_app(config: AppConfig | None = None) -> Flask:
     app.register_blueprint(web_bp)
     app.register_blueprint(api_bp, url_prefix="/api")
     app.register_blueprint(workouts_bp)
+    app.register_blueprint(sleep_bp)
 
     return app
 
