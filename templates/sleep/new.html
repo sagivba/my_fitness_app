@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <title>הוספת שינה</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <main class="container">
+    <h1>הוספת שינה</h1>
+    <p><a href="/sleep/">חזרה לשינה</a></p>
+
+    <form method="post" action="/sleep/">
+      <p>
+        <label for="sleep_date">תאריך שינה</label><br>
+        <input
+          id="sleep_date"
+          name="sleep_date"
+          type="date"
+          value="{{ values.get('sleep_date', '') }}"
+          required
+        >
+        {% if errors.get("sleep_date") %}
+          <span class="error">{{ errors["sleep_date"] }}</span>
+        {% endif %}
+      </p>
+
+      <p>
+        <label for="start_time">שעת התחלה</label><br>
+        <input
+          id="start_time"
+          name="start_time"
+          type="time"
+          value="{{ values.get('start_time', '') }}"
+        >
+      </p>
+
+      <p>
+        <label for="end_time">שעת סיום</label><br>
+        <input
+          id="end_time"
+          name="end_time"
+          type="time"
+          value="{{ values.get('end_time', '') }}"
+        >
+      </p>
+
+      <p>
+        <label for="duration_minutes">משך בדקות</label><br>
+        <input
+          id="duration_minutes"
+          name="duration_minutes"
+          type="number"
+          min="1"
+          value="{{ values.get('duration_minutes', '') }}"
+        >
+        {% if errors.get("duration_minutes") %}
+          <span class="error">{{ errors["duration_minutes"] }}</span>
+        {% endif %}
+      </p>
+
+      <p>
+        <label for="sleep_quality">איכות שינה</label><br>
+        <input
+          id="sleep_quality"
+          name="sleep_quality"
+          type="number"
+          min="1"
+          value="{{ values.get('sleep_quality', '') }}"
+        >
+        {% if errors.get("sleep_quality") %}
+          <span class="error">{{ errors["sleep_quality"] }}</span>
+        {% endif %}
+      </p>
+
+      <p>
+        <label for="notes">הערות</label><br>
+        <textarea id="notes" name="notes" rows="4">{{ values.get('notes', '') }}</textarea>
+      </p>
+
+      <button type="submit">שמירה</button>
+    </form>
+  </main>
+</body>
+</html>

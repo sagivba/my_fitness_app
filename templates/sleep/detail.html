@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <title>שינה {{ sleep_log.sleep_date }}</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <main class="container">
+    <h1>שינה {{ sleep_log.sleep_date }}</h1>
+    <p><a href="/sleep/">חזרה לשינה</a></p>
+
+    <dl>
+      <dt>תאריך</dt>
+      <dd>{{ sleep_log.sleep_date }}</dd>
+
+      {% if sleep_log.start_time %}
+        <dt>שעת התחלה</dt>
+        <dd>{{ sleep_log.start_time }}</dd>
+      {% endif %}
+
+      {% if sleep_log.end_time %}
+        <dt>שעת סיום</dt>
+        <dd>{{ sleep_log.end_time }}</dd>
+      {% endif %}
+
+      {% if sleep_log.duration_minutes %}
+        <dt>משך</dt>
+        <dd>{{ sleep_log.duration_minutes }} דקות</dd>
+      {% endif %}
+
+      {% if sleep_log.sleep_quality %}
+        <dt>איכות שינה</dt>
+        <dd>{{ sleep_log.sleep_quality }}</dd>
+      {% endif %}
+
+      {% if sleep_log.notes %}
+        <dt>הערות</dt>
+        <dd>{{ sleep_log.notes }}</dd>
+      {% endif %}
+    </dl>
+  </main>
+</body>
+</html>
