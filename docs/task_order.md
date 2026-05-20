@@ -11,7 +11,7 @@
 ## Phase 2 - Manual data collection MVP
 
 - Task 02: Workout CRUD
-- Task 03: Strength training details
+- Task 03: Strength training details - implemented as workout-linked exercises and sets
 - Task 04: Sleep and daily logs
 - Task 05: Manual meal logging
 

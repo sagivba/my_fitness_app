@@ -20,6 +20,7 @@ def initialize_database(database_path: str | Path) -> None:
     connection = connect(database_path)
     try:
         connection.executescript(schema)
+        _ensure_strength_tables(connection)
         _ensure_imported_file_status_columns(connection)
         _ensure_workout_metric_columns(connection)
         connection.commit()
@@ -57,3 +58,37 @@ def _ensure_workout_metric_columns(connection: sqlite3.Connection) -> None:
     for column_name, column_type in metric_columns.items():
         if column_name not in columns:
             connection.execute(f"ALTER TABLE workout ADD COLUMN {column_name} {column_type}")
+
+
+def _ensure_strength_tables(connection: sqlite3.Connection) -> None:
+    connection.execute(
+        """
+        CREATE TABLE IF NOT EXISTS strength_exercise (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            workout_id INTEGER NOT NULL,
+            exercise_name TEXT NOT NULL,
+            exercise_order INTEGER NOT NULL,
+            notes TEXT,
+            created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (workout_id) REFERENCES workout(id) ON DELETE CASCADE
+        )
+        """
+    )
+    connection.execute(
+        """
+        CREATE TABLE IF NOT EXISTS strength_set (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            strength_exercise_id INTEGER NOT NULL,
+            set_number INTEGER NOT NULL,
+            reps INTEGER NOT NULL,
+            weight_kg REAL,
+            perceived_effort INTEGER,
+            notes TEXT,
+            created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (strength_exercise_id)
+                REFERENCES strength_exercise(id) ON DELETE CASCADE
+        )
+        """
+    )
