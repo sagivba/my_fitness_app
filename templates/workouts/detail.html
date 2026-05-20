@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <title>{{ workout.workout_type }}</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <main class="container">
+    <h1>{{ workout.workout_type }}</h1>
+    <p><a href="/workouts/">חזרה לאימונים</a></p>
+
+    <dl>
+      <dt>תאריך</dt>
+      <dd>{{ workout.workout_date }}</dd>
+
+      {% if workout.duration_minutes %}
+        <dt>משך</dt>
+        <dd>{{ workout.duration_minutes }} דקות</dd>
+      {% endif %}
+
+      {% if workout.notes %}
+        <dt>הערות</dt>
+        <dd>{{ workout.notes }}</dd>
+      {% endif %}
+    </dl>
+  </main>
+</body>
+</html>

@@ -17,3 +17,27 @@ body {
 a {
   color: #0645ad;
 }
+
+input,
+textarea,
+button {
+  font: inherit;
+}
+
+input,
+textarea {
+  box-sizing: border-box;
+  max-width: 100%;
+  padding: 0.45rem;
+}
+
+button {
+  cursor: pointer;
+  padding: 0.5rem 0.8rem;
+}
+
+.error {
+  color: #b00020;
+  display: block;
+  margin-top: 0.25rem;
+}

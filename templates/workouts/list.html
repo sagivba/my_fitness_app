@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <title>אימונים</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <main class="container">
+    <h1>אימונים</h1>
+    <p><a href="/">דף הבית</a></p>
+    <p><a href="/workouts/new">הוספת אימון</a></p>
+
+    {% if workouts %}
+      <ul>
+        {% for workout in workouts %}
+          <li>
+            <a href="/workouts/{{ workout.id }}">
+              {{ workout.workout_date }} - {{ workout.workout_type }}
+            </a>
+            {% if workout.duration_minutes %}
+              <span>{{ workout.duration_minutes }} דקות</span>
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>עדיין אין אימונים שמורים.</p>
+    {% endif %}
+  </main>
+</body>
+</html>

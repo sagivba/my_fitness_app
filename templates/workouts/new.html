@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <title>הוספת אימון</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <main class="container">
+    <h1>הוספת אימון</h1>
+    <p><a href="/workouts/">חזרה לאימונים</a></p>
+
+    <form method="post" action="/workouts/">
+      <p>
+        <label for="workout_date">תאריך אימון</label><br>
+        <input
+          id="workout_date"
+          name="workout_date"
+          type="date"
+          value="{{ values.get('workout_date', '') }}"
+          required
+        >
+        {% if errors.get("workout_date") %}
+          <span class="error">{{ errors["workout_date"] }}</span>
+        {% endif %}
+      </p>
+
+      <p>
+        <label for="workout_type">סוג אימון</label><br>
+        <input
+          id="workout_type"
+          name="workout_type"
+          value="{{ values.get('workout_type', '') }}"
+          required
+        >
+        {% if errors.get("workout_type") %}
+          <span class="error">{{ errors["workout_type"] }}</span>
+        {% endif %}
+      </p>
+
+      <p>
+        <label for="duration_minutes">משך בדקות</label><br>
+        <input
+          id="duration_minutes"
+          name="duration_minutes"
+          type="number"
+          min="1"
+          value="{{ values.get('duration_minutes', '') }}"
+        >
+        {% if errors.get("duration_minutes") %}
+          <span class="error">{{ errors["duration_minutes"] }}</span>
+        {% endif %}
+      </p>
+
+      <p>
+        <label for="notes">הערות</label><br>
+        <textarea id="notes" name="notes" rows="4">{{ values.get('notes', '') }}</textarea>
+      </p>
+
+      <button type="submit">שמירה</button>
+    </form>
+  </main>
+</body>
+</html>
