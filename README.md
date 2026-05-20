@@ -7,7 +7,7 @@ The application is intended to collect and organize personal fitness, sleep, nut
 ## Current status
 
 This repository currently contains the initialized Flask foundation for the app and a
-minimal SQLite persistence foundation. It does not include user-facing CRUD screens yet.
+minimal SQLite persistence foundation with basic workout data entry.
 
 The next development phase can build manual data collection features on top of the
 database foundation.
@@ -134,6 +134,13 @@ Health endpoint:
 http://127.0.0.1:5000/api/health
 ```
 
+Workout pages:
+
+```text
+http://127.0.0.1:5000/workouts/
+http://127.0.0.1:5000/workouts/new
+```
+
 ## SQLite persistence
 
 The app reads its database location from `DATABASE_PATH`.
@@ -146,7 +153,8 @@ instance/my_fitness_app.db
 
 The `instance/` directory is local application data and is not tracked by Git.
 
-The model layer owns database access in:
+The app initializes the configured SQLite schema during startup. The model layer owns
+database access in:
 
 ```text
 src/my_fitness_app/model/database.py
@@ -161,7 +169,7 @@ The initial schema creates these MVP tables:
 - `meal`
 - `imported_file`
 
-Initialize the configured database in Docker:
+You can also initialize the configured database directly in Docker:
 
 ```bash
 docker compose \
