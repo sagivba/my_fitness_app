@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <title>{{ imported_file.original_filename }}</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <main class="container">
+    <h1>{{ imported_file.original_filename }}</h1>
+    <p><a href="/imports/">חזרה לייבוא קבצים</a></p>
+
+    {% if is_duplicate %}
+      <p>הקובץ כבר נשמר בעבר. לא נוצר עותק נוסף.</p>
+    {% endif %}
+
+    <dl>
+      <dt>שם קובץ מקורי</dt>
+      <dd>{{ imported_file.original_filename }}</dd>
+
+      <dt>סוג קובץ</dt>
+      <dd>{{ imported_file.file_type }}</dd>
+
+      <dt>נתיב שמירה</dt>
+      <dd>{{ imported_file.stored_path }}</dd>
+
+      <dt>SHA-256</dt>
+      <dd>{{ imported_file.file_hash }}</dd>
+
+      <dt>זמן ייבוא</dt>
+      <dd>{{ imported_file.imported_at }}</dd>
+
+      <dt>נוצר בתאריך</dt>
+      <dd>{{ imported_file.created_at }}</dd>
+
+      <dt>עודכן בתאריך</dt>
+      <dd>{{ imported_file.updated_at }}</dd>
+    </dl>
+  </main>
+</body>
+</html>

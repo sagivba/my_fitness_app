@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <title>ייבוא קבצים</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <main class="container">
+    <h1>ייבוא קבצים</h1>
+    <p><a href="/">דף הבית</a></p>
+    <p><a href="/imports/new">העלאת קובץ</a></p>
+
+    {% if imported_files %}
+      <ul>
+        {% for imported_file in imported_files %}
+          <li>
+            <a href="/imports/{{ imported_file.id }}">
+              {{ imported_file.original_filename }}
+            </a>
+            <span>{{ imported_file.file_type }}</span>
+            <span>{{ imported_file.imported_at }}</span>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>עדיין אין קבצי ייבוא שמורים.</p>
+    {% endif %}
+  </main>
+</body>
+</html>
