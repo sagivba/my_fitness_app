@@ -1,0 +1,40 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "tests: quick",
+      "type": "shell",
+      "command": "scripts/test.sh quick",
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "tests: full",
+      "type": "shell",
+      "command": "scripts/test.sh full",
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "lint",
+      "type": "shell",
+      "command": "scripts/lint.sh",
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "docker: dev up",
+      "type": "shell",
+      "command": "docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d --build",
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "docker: qa up",
+      "type": "shell",
+      "command": "docker compose -f docker-compose.yml -f docker-compose.qa.yml up -d --build",
+      "group": "build",
+      "problemMatcher": []
+    }
+  ]
+}

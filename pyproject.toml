@@ -1,0 +1,26 @@
+[project]
+name = "my-python-project-template"
+version = "0.1.0"
+description = "AI-friendly Python project template"
+requires-python = ">=3.12"
+dependencies = [
+  "Flask>=3.0,<4.0",
+  "python-dotenv>=1.0,<2.0",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+ignore = []
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "lf"
+
+[tool.setuptools.packages.find]
+where = ["src"]

@@ -1,0 +1,41 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Run Flask app",
+      "type": "python",
+      "request": "launch",
+      "module": "flask",
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}/src",
+        "FLASK_ENV": "development"
+      },
+      "args": [
+        "--app",
+        "my_python_project_template.app:create_app",
+        "run",
+        "--debug"
+      ],
+      "jinja": true,
+      "justMyCode": true
+    },
+    {
+      "name": "Run unittest",
+      "type": "python",
+      "request": "launch",
+      "module": "unittest",
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}/src"
+      },
+      "args": [
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_*.py",
+        "-v"
+      ],
+      "justMyCode": true
+    }
+  ]
+}
