@@ -8,6 +8,8 @@ from my_fitness_app.model.database import connect, initialize_database
 REQUIRED_TABLES = {
     "daily_log",
     "workout",
+    "strength_exercise",
+    "strength_set",
     "sleep_log",
     "meal",
     "imported_file",
@@ -33,6 +35,20 @@ REQUIRED_COLUMNS = {
         "import_error_message",
         "import_status",
         "updated_at",
+    },
+    "strength_exercise": {
+        "workout_id",
+        "exercise_name",
+        "exercise_order",
+        "notes",
+    },
+    "strength_set": {
+        "strength_exercise_id",
+        "set_number",
+        "reps",
+        "weight_kg",
+        "perceived_effort",
+        "notes",
     },
 }
 
@@ -190,3 +206,42 @@ class TestDatabase(TestCase):
         self.assertEqual(row["notes"], "existing row")
         self.assertIsNone(row["start_time"])
         self.assertIsNone(row["distance_meters"])
+
+    def test_initialize_database_adds_strength_tables_to_existing_database(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            database_path = Path(temp_dir) / "fitness.db"
+            connection = connect(database_path)
+            try:
+                connection.execute(
+                    """
+                    CREATE TABLE workout (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        workout_date TEXT NOT NULL,
+                        workout_type TEXT NOT NULL,
+                        duration_minutes INTEGER,
+                        source TEXT NOT NULL DEFAULT 'manual',
+                        notes TEXT,
+                        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+                    )
+                    """
+                )
+                connection.commit()
+            finally:
+                connection.close()
+
+            initialize_database(database_path)
+
+            connection = connect(database_path)
+            try:
+                table_names = {
+                    row["name"]
+                    for row in connection.execute(
+                        "SELECT name FROM sqlite_master WHERE type = 'table'"
+                    )
+                }
+            finally:
+                connection.close()
+
+        self.assertIn("strength_exercise", table_names)
+        self.assertIn("strength_set", table_names)

@@ -55,6 +55,8 @@ Business logic.
 Services should be easy to test with unittest.
 
 Workout validation and application logic live in `services/workout_service.py`.
+Workout-linked strength training validation, exercise reuse, set numbering, and
+summary calculations live in `services/strength_service.py`.
 Sleep validation and application logic live in `services/sleep_service.py`.
 Daily log validation and application logic live in `services/daily_log_service.py`.
 Meal validation and application logic live in `services/meal_service.py`.
@@ -77,8 +79,10 @@ SQLite persistence foundation:
 
 - `model/database.py` creates SQLite connections and initializes the schema.
 - `model/schema.sql` defines the MVP tables: `daily_log`, `workout`, `sleep_log`,
-  `meal`, and `imported_file`.
+  `strength_exercise`, `strength_set`, `meal`, and `imported_file`.
 - `model/workout_repository.py` contains workout persistence operations.
+- `model/strength_repository.py` contains strength exercise and set persistence
+  operations.
 - `model/sleep_repository.py` contains sleep log persistence operations.
 - `model/daily_log_repository.py` contains daily log persistence operations.
 - `model/meal_repository.py` contains meal persistence operations.
@@ -100,11 +104,17 @@ The workout table stores manual workout fields plus structured Garmin/workout me
 `elevation_loss_meters`, and `external_activity_id`. The existing `source` field
 identifies manual entries and Garmin import sources.
 
+Strength details are optional and linked to workouts through `strength_exercise`.
+Each strength exercise belongs to one workout and can have many `strength_set` rows.
+Deleting a workout cascades to its strength exercises and sets. The strength service
+can reuse an existing exercise on the same workout when a new set uses the same
+normalized exercise name.
+
 Because the project does not use a migration framework, fresh databases receive these
 columns through `model/schema.sql`, and existing SQLite databases are hardened by
 idempotent compatibility checks in `model/database.py`. The compatibility logic only
-adds missing nullable columns. It does not drop tables, recreate tables, or rewrite
-existing rows.
+adds missing nullable columns and creates missing strength detail tables. It does not
+drop tables, recreate tables, or rewrite existing rows.
 
 Garmin CSV, TCX, and GPX import creates normalized workout records from supported files
 using the existing workout table. Importers set workout `source` to `garmin_csv`,
@@ -112,8 +122,7 @@ using the existing workout table. Importers set workout `source` to `garmin_csv`
 Workout notes remain a deterministic, human-readable summary and legacy duplicate
 fallback only; dashboard metrics must not parse notes.
 
-FIT, Garmin Connect integration, advanced analytics, charts, and strength training
-details remain future scope.
+FIT, Garmin Connect integration, advanced analytics, and charts remain future scope.
 
 ## src/my_fitness_app/utils
 

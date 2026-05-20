@@ -24,6 +24,136 @@
         <dd>{{ workout.notes }}</dd>
       {% endif %}
     </dl>
+
+    <section>
+      <h2>אימון כוח</h2>
+
+      <dl>
+        <dt>תרגילים</dt>
+        <dd>{{ strength_summary.total_exercises }}</dd>
+
+        <dt>סטים</dt>
+        <dd>{{ strength_summary.total_sets }}</dd>
+
+        <dt>חזרות</dt>
+        <dd>{{ strength_summary.total_reps }}</dd>
+
+        <dt>נפח כולל</dt>
+        <dd>{{ "%.2f"|format(strength_summary.total_volume_kg) }} ק"ג</dd>
+      </dl>
+
+      {% if strength_exercises %}
+        {% for exercise in strength_exercises %}
+          <h3>{{ exercise.exercise_order }}. {{ exercise.exercise_name }}</h3>
+          {% if exercise.sets %}
+            <table>
+              <thead>
+                <tr>
+                  <th>סט</th>
+                  <th>חזרות</th>
+                  <th>משקל</th>
+                  <th>מאמץ</th>
+                  <th>הערות</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for strength_set in exercise.sets %}
+                  <tr>
+                    <td>{{ strength_set.set_number }}</td>
+                    <td>{{ strength_set.reps }}</td>
+                    <td>
+                      {% if strength_set.weight_kg is not none %}
+                        {{ strength_set.weight_kg }} ק"ג
+                      {% else %}
+                        ללא משקל
+                      {% endif %}
+                    </td>
+                    <td>
+                      {% if strength_set.perceived_effort %}
+                        {{ strength_set.perceived_effort }}
+                      {% else %}
+                        -
+                      {% endif %}
+                    </td>
+                    <td>{{ strength_set.notes or "-" }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          {% endif %}
+        {% endfor %}
+      {% else %}
+        <p>עדיין אין פרטי כוח לאימון הזה.</p>
+      {% endif %}
+
+      <h3>הוספת סט כוח</h3>
+      <form method="post" action="/workouts/{{ workout.id }}/strength-sets">
+        <p>
+          <label for="exercise_name">שם תרגיל</label><br>
+          <input
+            id="exercise_name"
+            name="exercise_name"
+            value="{{ strength_values.get('exercise_name', '') }}"
+            required
+          >
+          {% if strength_errors.get("exercise_name") %}
+            <span class="error">{{ strength_errors["exercise_name"] }}</span>
+          {% endif %}
+        </p>
+
+        <p>
+          <label for="reps">חזרות</label><br>
+          <input
+            id="reps"
+            name="reps"
+            type="number"
+            min="1"
+            value="{{ strength_values.get('reps', '') }}"
+            required
+          >
+          {% if strength_errors.get("reps") %}
+            <span class="error">{{ strength_errors["reps"] }}</span>
+          {% endif %}
+        </p>
+
+        <p>
+          <label for="weight_kg">משקל בק"ג</label><br>
+          <input
+            id="weight_kg"
+            name="weight_kg"
+            type="number"
+            min="0"
+            step="0.01"
+            value="{{ strength_values.get('weight_kg', '') }}"
+          >
+          {% if strength_errors.get("weight_kg") %}
+            <span class="error">{{ strength_errors["weight_kg"] }}</span>
+          {% endif %}
+        </p>
+
+        <p>
+          <label for="perceived_effort">מאמץ נתפס</label><br>
+          <input
+            id="perceived_effort"
+            name="perceived_effort"
+            type="number"
+            min="1"
+            max="10"
+            value="{{ strength_values.get('perceived_effort', '') }}"
+          >
+          {% if strength_errors.get("perceived_effort") %}
+            <span class="error">{{ strength_errors["perceived_effort"] }}</span>
+          {% endif %}
+        </p>
+
+        <p>
+          <label for="strength_notes">הערות</label><br>
+          <textarea id="strength_notes" name="notes" rows="3">{{ strength_values.get('notes', '') }}</textarea>
+        </p>
+
+        <button type="submit">הוספת סט</button>
+      </form>
+    </section>
   </main>
 </body>
 </html>

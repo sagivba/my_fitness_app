@@ -8,7 +8,8 @@ The application is intended to collect and organize personal fitness, sleep, nut
 
 This repository currently contains the initialized Flask foundation for the app and a
 minimal SQLite persistence foundation with basic workout, sleep, daily log, manual
-meal data entry, raw activity file storage, and Garmin CSV/TCX/GPX import paths.
+meal data entry, workout-linked strength training details, raw activity file
+storage, and Garmin CSV/TCX/GPX import paths.
 
 The Garmin import foundation stores raw files and can import documented CSV, TCX, and
 GPX formats into workout records. Supported Garmin metadata is persisted in structured
@@ -144,6 +145,10 @@ http://127.0.0.1:5000/workouts/
 http://127.0.0.1:5000/workouts/new
 ```
 
+Workout detail pages include an `אימון כוח` section for adding strength sets.
+Strength entries are stored as exercises linked to a workout, with one or more sets
+per exercise. Totals show exercise count, set count, rep count, and weighted volume.
+
 Workout metrics dashboard:
 
 ```text
@@ -231,6 +236,8 @@ The initial schema creates these MVP tables:
 
 - `daily_log`
 - `workout`
+- `strength_exercise`
+- `strength_set`
 - `sleep_log`
 - `meal`
 - `imported_file`
@@ -250,9 +257,9 @@ and the mini dashboard:
 - `external_activity_id`
 
 Existing SQLite databases are updated during startup by simple idempotent
-compatibility checks that add missing nullable columns. The project does not use a
-migration framework. Workout notes remain human-readable summaries and are not used as
-the source for dashboard metrics.
+compatibility checks that add missing nullable columns and create missing strength
+training detail tables. The project does not use a migration framework. Workout notes
+remain human-readable summaries and are not used as the source for dashboard metrics.
 
 You can also initialize the configured database directly in Docker:
 

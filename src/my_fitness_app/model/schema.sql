@@ -30,6 +30,30 @@ CREATE TABLE IF NOT EXISTS workout (
     updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS strength_exercise (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    workout_id INTEGER NOT NULL,
+    exercise_name TEXT NOT NULL,
+    exercise_order INTEGER NOT NULL,
+    notes TEXT,
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (workout_id) REFERENCES workout(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS strength_set (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    strength_exercise_id INTEGER NOT NULL,
+    set_number INTEGER NOT NULL,
+    reps INTEGER NOT NULL,
+    weight_kg REAL,
+    perceived_effort INTEGER,
+    notes TEXT,
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (strength_exercise_id) REFERENCES strength_exercise(id) ON DELETE CASCADE
+);
+
 CREATE TABLE IF NOT EXISTS sleep_log (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     sleep_date TEXT NOT NULL UNIQUE,
