@@ -39,6 +39,7 @@ Current web route groups:
 
 - `web.py` renders the home page.
 - `workouts.py` handles workout list, create form, create submit, and detail pages.
+- `sleep.py` handles sleep log list, create form, create submit, and detail pages.
 
 ## src/my_fitness_app/services
 
@@ -47,6 +48,7 @@ Business logic.
 Services should be easy to test with unittest.
 
 Workout validation and application logic live in `services/workout_service.py`.
+Sleep validation and application logic live in `services/sleep_service.py`.
 
 ## src/my_fitness_app/model
 
@@ -58,6 +60,7 @@ SQLite persistence foundation:
 - `model/schema.sql` defines the MVP tables: `daily_log`, `workout`, `sleep_log`,
   `meal`, and `imported_file`.
 - `model/workout_repository.py` contains workout persistence operations.
+- `model/sleep_repository.py` contains sleep log persistence operations.
 - Route handlers must not call SQLite directly.
 
 ## src/my_fitness_app/utils

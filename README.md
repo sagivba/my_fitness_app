@@ -7,7 +7,7 @@ The application is intended to collect and organize personal fitness, sleep, nut
 ## Current status
 
 This repository currently contains the initialized Flask foundation for the app and a
-minimal SQLite persistence foundation with basic workout data entry.
+minimal SQLite persistence foundation with basic workout and sleep data entry.
 
 The next development phase can build manual data collection features on top of the
 database foundation.
@@ -139,6 +139,13 @@ Workout pages:
 ```text
 http://127.0.0.1:5000/workouts/
 http://127.0.0.1:5000/workouts/new
+```
+
+Sleep pages:
+
+```text
+http://127.0.0.1:5000/sleep/
+http://127.0.0.1:5000/sleep/new
 ```
 
 ## SQLite persistence
