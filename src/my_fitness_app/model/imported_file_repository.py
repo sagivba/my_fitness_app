@@ -42,8 +42,8 @@ def list_imported_files(database_path: str | Path) -> list[ImportedFile]:
     try:
         rows = connection.execute(
             """
-            SELECT id, original_filename, stored_path, file_hash, file_type,
-                   imported_at, created_at, updated_at
+            SELECT id, original_filename, stored_path, file_hash, file_type, import_status,
+                   import_error_message, imported_at, created_at, updated_at
             FROM imported_file
             ORDER BY imported_at DESC, id DESC
             """
@@ -62,8 +62,8 @@ def get_imported_file(
     try:
         row = connection.execute(
             """
-            SELECT id, original_filename, stored_path, file_hash, file_type,
-                   imported_at, created_at, updated_at
+            SELECT id, original_filename, stored_path, file_hash, file_type, import_status,
+                   import_error_message, imported_at, created_at, updated_at
             FROM imported_file
             WHERE id = ?
             """,
@@ -85,8 +85,8 @@ def get_imported_file_by_hash(
     try:
         row = connection.execute(
             """
-            SELECT id, original_filename, stored_path, file_hash, file_type,
-                   imported_at, created_at, updated_at
+            SELECT id, original_filename, stored_path, file_hash, file_type, import_status,
+                   import_error_message, imported_at, created_at, updated_at
             FROM imported_file
             WHERE file_hash = ?
             """,
@@ -100,6 +100,33 @@ def get_imported_file_by_hash(
     return _imported_file_from_row(row)
 
 
+def update_import_status(
+    database_path: str | Path,
+    imported_file_id: int,
+    import_status: str,
+    import_error_message: str | None,
+) -> ImportedFile | None:
+    connection = connect(database_path)
+    try:
+        cursor = connection.execute(
+            """
+            UPDATE imported_file
+            SET import_status = ?,
+                import_error_message = ?,
+                updated_at = CURRENT_TIMESTAMP
+            WHERE id = ?
+            """,
+            (import_status, import_error_message, imported_file_id),
+        )
+        connection.commit()
+        if cursor.rowcount == 0:
+            return None
+    finally:
+        connection.close()
+
+    return get_imported_file(database_path, imported_file_id)
+
+
 def _imported_file_from_row(row: sqlite3.Row) -> ImportedFile:
     return ImportedFile(
         id=row["id"],
@@ -107,6 +134,8 @@ def _imported_file_from_row(row: sqlite3.Row) -> ImportedFile:
         stored_path=row["stored_path"],
         file_hash=row["file_hash"],
         file_type=row["file_type"],
+        import_status=row["import_status"],
+        import_error_message=row["import_error_message"],
         imported_at=row["imported_at"],
         created_at=row["created_at"],
         updated_at=row["updated_at"],

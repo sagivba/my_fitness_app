@@ -10,13 +10,14 @@ def create_workout(database_path: str | Path, workout: NewWorkout) -> Workout:
     try:
         cursor = connection.execute(
             """
-            INSERT INTO workout (workout_date, workout_type, duration_minutes, notes)
-            VALUES (?, ?, ?, ?)
+            INSERT INTO workout (workout_date, workout_type, duration_minutes, source, notes)
+            VALUES (?, ?, ?, ?, ?)
             """,
             (
                 workout.workout_date,
                 workout.workout_type,
                 workout.duration_minutes,
+                workout.source,
                 workout.notes,
             ),
         )
@@ -60,6 +61,43 @@ def get_workout(database_path: str | Path, workout_id: int) -> Workout | None:
             WHERE id = ?
             """,
             (workout_id,),
+        ).fetchone()
+    finally:
+        connection.close()
+
+    if row is None:
+        return None
+    return _workout_from_row(row)
+
+
+def find_garmin_csv_workout_duplicate(
+    database_path: str | Path,
+    workout_date: str,
+    start_time: str,
+    workout_type: str,
+    duration_minutes: int,
+) -> Workout | None:
+    connection = connect(database_path)
+    try:
+        row = connection.execute(
+            """
+            SELECT id, workout_date, workout_type, duration_minutes, source, notes,
+                   created_at, updated_at
+            FROM workout
+            WHERE workout_date = ?
+              AND workout_type = ?
+              AND duration_minutes = ?
+              AND source = 'garmin_csv'
+              AND notes LIKE ?
+            ORDER BY id DESC
+            LIMIT 1
+            """,
+            (
+                workout_date,
+                workout_type,
+                duration_minutes,
+                f"Garmin CSV start time: {start_time}%",
+            ),
         ).fetchone()
     finally:
         connection.close()

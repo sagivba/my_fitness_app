@@ -18,6 +18,8 @@ REQUIRED_COLUMNS = {
         "fiber_grams",
     },
     "imported_file": {
+        "import_error_message",
+        "import_status",
         "updated_at",
     },
 }
@@ -94,3 +96,39 @@ class TestDatabase(TestCase):
                 connection.close()
 
         self.assertEqual(workout_count, 0)
+
+    def test_initialize_database_adds_import_status_columns_to_existing_imported_file_table(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            database_path = Path(temp_dir) / "fitness.db"
+            connection = connect(database_path)
+            try:
+                connection.execute(
+                    """
+                    CREATE TABLE imported_file (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        original_filename TEXT NOT NULL,
+                        stored_path TEXT NOT NULL,
+                        file_hash TEXT NOT NULL UNIQUE,
+                        file_type TEXT NOT NULL,
+                        imported_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+                    )
+                    """
+                )
+                connection.commit()
+            finally:
+                connection.close()
+
+            initialize_database(database_path)
+
+            connection = connect(database_path)
+            try:
+                columns = {
+                    row["name"] for row in connection.execute("PRAGMA table_info(imported_file)")
+                }
+            finally:
+                connection.close()
+
+        self.assertIn("import_status", columns)
+        self.assertIn("import_error_message", columns)

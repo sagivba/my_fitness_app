@@ -19,3 +19,4 @@ class NewWorkout:
     workout_type: str
     duration_minutes: int | None
     notes: str | None
+    source: str = "manual"

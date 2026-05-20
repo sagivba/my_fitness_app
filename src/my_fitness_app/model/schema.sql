@@ -54,6 +54,8 @@ CREATE TABLE IF NOT EXISTS imported_file (
     stored_path TEXT NOT NULL,
     file_hash TEXT NOT NULL UNIQUE,
     file_type TEXT NOT NULL,
+    import_status TEXT NOT NULL DEFAULT 'not_imported',
+    import_error_message TEXT,
     imported_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
     created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP

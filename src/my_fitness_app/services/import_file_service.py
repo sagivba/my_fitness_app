@@ -33,6 +33,20 @@ def get_imported_file(
     return imported_file_repository.get_imported_file(database_path, imported_file_id)
 
 
+def update_import_status(
+    database_path: str | Path,
+    imported_file_id: int,
+    import_status: str,
+    import_error_message: str | None,
+) -> ImportedFile | None:
+    return imported_file_repository.update_import_status(
+        database_path,
+        imported_file_id,
+        import_status,
+        import_error_message,
+    )
+
+
 def upload_import_file(
     database_path: str | Path,
     upload_directory: str | Path,

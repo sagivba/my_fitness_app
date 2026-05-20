@@ -6,6 +6,9 @@ from unittest import TestCase
 from my_fitness_app.app import create_app
 from my_fitness_app.config import AppConfig
 from my_fitness_app.services.import_file_service import list_imported_files
+from my_fitness_app.services.workout_service import list_workouts
+
+FIXTURE_DIR = Path(__file__).parent / "fixtures"
 
 
 class TestImportRoutes(TestCase):
@@ -66,10 +69,58 @@ class TestImportRoutes(TestCase):
         self.assertEqual(detail_response.status_code, 200)
         self.assertIn(b"activity.csv", detail_response.data)
         self.assertIn(b"SHA-256", detail_response.data)
+        self.assertIn("סטטוס ייבוא".encode(), detail_response.data)
+        self.assertIn(b"not_imported", detail_response.data)
         self.assertIn("נוצר בתאריך".encode(), detail_response.data)
         self.assertIn(imported_file.created_at.encode(), detail_response.data)
         self.assertIn("עודכן בתאריך".encode(), detail_response.data)
         self.assertIn(imported_file.updated_at.encode(), detail_response.data)
+        self.assertIn("ייבוא Garmin CSV".encode(), detail_response.data)
+
+    def test_post_garmin_csv_import_runs_import_and_renders_summary(self):
+        fixture_content = (FIXTURE_DIR / "garmin_supported.csv").read_bytes()
+        upload_response = self.client.post(
+            "/imports/",
+            data={"file": (BytesIO(fixture_content), "garmin_supported.csv")},
+            content_type="multipart/form-data",
+        )
+        imported_file = list_imported_files(self.database_path)[0]
+
+        response = self.client.post(f"/imports/{imported_file.id}/garmin-csv-import")
+
+        workouts = list_workouts(self.database_path)
+        self.assertEqual(upload_response.status_code, 302)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("סיכום ייבוא".encode(), response.data)
+        self.assertIn("שורות שנקראו".encode(), response.data)
+        self.assertIn("אימונים שנוצרו".encode(), response.data)
+        self.assertIn("כפילויות שדולגו".encode(), response.data)
+        self.assertIn("שורות שגויות".encode(), response.data)
+        self.assertIn("סטטוס סופי".encode(), response.data)
+        self.assertIn(b"imported", response.data)
+        self.assertEqual(len(workouts), 2)
+
+    def test_post_garmin_csv_import_reports_malformed_rows(self):
+        fixture_content = (FIXTURE_DIR / "garmin_malformed.csv").read_bytes()
+        self.client.post(
+            "/imports/",
+            data={"file": (BytesIO(fixture_content), "garmin_malformed.csv")},
+            content_type="multipart/form-data",
+        )
+        imported_file = list_imported_files(self.database_path)[0]
+
+        response = self.client.post(f"/imports/{imported_file.id}/garmin-csv-import")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b"failed", response.data)
+        self.assertIn(b"Row 2", response.data)
+        self.assertIn(b"Row 3", response.data)
+        self.assertEqual(list_workouts(self.database_path), [])
+
+    def test_post_garmin_csv_import_missing_file_returns_404(self):
+        response = self.client.post("/imports/999/garmin-csv-import")
+
+        self.assertEqual(response.status_code, 404)
 
     def test_post_duplicate_import_redirects_to_existing_detail(self):
         first_response = self.client.post(
