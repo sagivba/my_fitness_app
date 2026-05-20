@@ -45,7 +45,7 @@ Current web route groups:
 - `meals.py` handles meal list, create form, create submit, detail, edit form, and
   update submit pages.
 - `imports.py` handles raw import file list, upload form, upload submit, and detail
-  pages, plus the action that triggers Garmin CSV import for uploaded CSV files.
+  pages, plus actions that trigger Garmin CSV, TCX, and GPX import for uploaded files.
 
 ## src/my_fitness_app/services
 
@@ -61,6 +61,10 @@ Raw import file validation, hashing, duplicate detection, and local storage logi
 in `services/import_file_service.py`.
 Garmin CSV parsing, row validation, duplicate workout detection, workout creation, and
 import status updates live in `services/garmin_csv_import_service.py`.
+Garmin TCX XML parsing, duplicate workout detection, workout creation, and import
+status updates live in `services/garmin_tcx_import_service.py`.
+Garmin GPX XML parsing, distance calculation, duplicate workout detection, workout
+creation, and import status updates live in `services/garmin_gpx_import_service.py`.
 
 ## src/my_fitness_app/model
 
@@ -87,11 +91,12 @@ Raw import file storage currently uses only existing `imported_file` table field
 `created_at`, and `updated_at`. CP07 adds minimal import tracking fields to
 `imported_file`: `import_status` and `import_error_message`.
 
-Garmin CSV import creates normalized workout records from supported CSV rows using the
-existing workout table. The importer sets workout `source` to `garmin_csv` and stores
-CSV start time in workout notes for duplicate detection without changing the workout
-schema. FIT, TCX, GPX, Garmin Connect integration, dashboard metrics, analytics, and
-strength training details remain future scope.
+Garmin CSV, TCX, and GPX import creates normalized workout records from supported files
+using the existing workout table. Importers set workout `source` to `garmin_csv`,
+`garmin_tcx`, or `garmin_gpx` and store start time, distance, and other parsed metadata
+in deterministic workout notes for duplicate detection without changing the workout
+schema. FIT, Garmin Connect integration, dashboard metrics, analytics, and strength
+training details remain future scope.
 
 ## src/my_fitness_app/utils
 

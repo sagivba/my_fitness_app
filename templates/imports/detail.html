@@ -18,6 +18,14 @@
       <form method="post" action="/imports/{{ imported_file.id }}/garmin-csv-import">
         <button type="submit">ייבוא Garmin CSV</button>
       </form>
+    {% elif imported_file.file_type == "tcx" %}
+      <form method="post" action="/imports/{{ imported_file.id }}/garmin-tcx-import">
+        <button type="submit">ייבוא Garmin TCX</button>
+      </form>
+    {% elif imported_file.file_type == "gpx" %}
+      <form method="post" action="/imports/{{ imported_file.id }}/garmin-gpx-import">
+        <button type="submit">ייבוא Garmin GPX</button>
+      </form>
     {% endif %}
 
     {% if import_result %}

@@ -1,6 +1,11 @@
 from flask import Blueprint, abort, current_app, redirect, render_template, request, url_for
 
-from my_fitness_app.services import garmin_csv_import_service, import_file_service
+from my_fitness_app.services import (
+    garmin_csv_import_service,
+    garmin_gpx_import_service,
+    garmin_tcx_import_service,
+    import_file_service,
+)
 from my_fitness_app.services.import_file_service import ImportFileValidationError
 
 imports_bp = Blueprint("imports", __name__, url_prefix="/imports")
@@ -68,6 +73,40 @@ def get_import(imported_file_id: int):
 @imports_bp.post("/<int:imported_file_id>/garmin-csv-import")
 def import_garmin_csv(imported_file_id: int):
     import_result = garmin_csv_import_service.import_garmin_csv(
+        current_app.config["DATABASE_PATH"],
+        imported_file_id,
+    )
+    if import_result is None:
+        abort(404)
+
+    return render_template(
+        "imports/detail.html",
+        imported_file=import_result.imported_file,
+        is_duplicate=False,
+        import_result=import_result,
+    )
+
+
+@imports_bp.post("/<int:imported_file_id>/garmin-tcx-import")
+def import_garmin_tcx(imported_file_id: int):
+    import_result = garmin_tcx_import_service.import_garmin_tcx(
+        current_app.config["DATABASE_PATH"],
+        imported_file_id,
+    )
+    if import_result is None:
+        abort(404)
+
+    return render_template(
+        "imports/detail.html",
+        imported_file=import_result.imported_file,
+        is_duplicate=False,
+        import_result=import_result,
+    )
+
+
+@imports_bp.post("/<int:imported_file_id>/garmin-gpx-import")
+def import_garmin_gpx(imported_file_id: int):
+    import_result = garmin_gpx_import_service.import_garmin_gpx(
         current_app.config["DATABASE_PATH"],
         imported_file_id,
     )

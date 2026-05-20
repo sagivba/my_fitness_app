@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TrainingCenterDatabase xmlns="http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2">
+  <Activities>
+    <Activity Sport="Walking">
+      <Id>2026-05-19T06:15:00Z</Id>
+      <Lap StartTime="2026-05-19T06:15:00Z">
+        <TotalTimeSeconds>900.0</TotalTimeSeconds>
+        <DistanceMeters>1200.0</DistanceMeters>
+        <Calories>90</Calories>
+      </Lap>
+    </Activity>
+  </Activities>
+</TrainingCenterDatabase>

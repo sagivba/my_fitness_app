@@ -1,17 +1,26 @@
-# Garmin CSV Imports
+# Garmin Imports
 
-CP07 adds a small Garmin CSV import path on top of CP06 raw file storage.
+Garmin imports build on CP06 raw file storage. Files are uploaded first, then imported
+from the imported file detail page.
 
-## Supported file type
+## Supported File Types
 
-Only uploaded raw import files with `file_type` set to `csv` can be processed by the
-Garmin CSV importer.
+Supported import processors:
 
-CP07 does not parse FIT, TCX, or GPX files and does not integrate with Garmin Connect.
+- CSV: small documented activity export format.
+- TCX: basic activity XML.
+- GPX: basic track XML.
 
-## Supported CSV columns
+Unsupported:
 
-The first supported fixture format is:
+- FIT parsing is not implemented.
+- Garmin Connect API integration is not implemented.
+- Maps, charts, dashboard metrics, analytics, and strength training details are not
+  part of the Garmin import foundation.
+
+## CSV
+
+The supported CSV fixture format is:
 
 ```text
 activity_date,start_time,activity_type,duration_minutes,notes
@@ -28,57 +37,109 @@ Optional columns:
 
 - `notes`: free text copied into the created workout notes.
 
-The parser also accepts these simple header aliases:
+Accepted header aliases:
 
 - `Activity Date` or `Date` for `activity_date`
 - `Start Time` or `Time` for `start_time`
 - `Activity Type` or `Type` for `activity_type`
 - `Duration Minutes` or `Duration` for `duration_minutes`
 
-## Created workouts
+CSV imports create one workout per valid row with `source` set to `garmin_csv`.
 
-Each valid CSV row creates one `workout` record using existing workout fields:
+## TCX
 
-- `workout_date` from `activity_date`
-- `workout_type` from `activity_type`
-- `duration_minutes` from `duration_minutes`
-- `source` set to `garmin_csv`
-- `notes` containing the Garmin CSV start time, CSV row number, and optional CSV notes
+TCX imports use Python standard-library XML parsing and support XML namespaces.
 
-CP07 does not add strength training details, dashboard metrics, analytics, or medical
-interpretation.
+Supported fields when present:
 
-## Duplicate detection
+- Activity sport type.
+- Activity start time from the first lap `StartTime`, falling back to activity `Id`.
+- Duration from lap `TotalTimeSeconds`.
+- Distance from lap `DistanceMeters`.
+- Calories from lap `Calories`.
+- Average heart rate from lap `AverageHeartRateBpm/Value`.
+- Max heart rate from lap `MaximumHeartRateBpm/Value`.
+- Source metadata in workout notes.
 
-The importer skips likely duplicate Garmin CSV workouts when an existing `garmin_csv`
-workout has the same:
+TCX imports create one workout per supported TCX file with `source` set to
+`garmin_tcx`. Optional missing fields do not fail the import. Missing optional fields
+are recorded in deterministic workout notes.
+
+Unsupported or incomplete TCX structures fail predictably. For example, a TCX file
+without an `Activity`, without a `Lap`, or without a usable start time is marked
+`failed` with a clear `import_error_message`.
+
+## GPX
+
+GPX imports use Python standard-library XML parsing and support XML namespaces.
+
+Supported fields when present:
+
+- First track point time as start time.
+- Last track point time as end time.
+- Duration from first and last point time.
+- Track type from `type`, falling back to `name`, then `GPX activity`.
+- Track point count.
+- Track segment count.
+- Distance calculated with the Haversine formula between consecutive track points in
+  each segment.
+- Elevation min, max, and gain from track point `ele` values.
+
+GPX imports create one workout per supported GPX file with `source` set to
+`garmin_gpx`. Start/end time, distance, point count, segment count, elevation metadata,
+and missing optional fields are recorded in deterministic workout notes.
+
+GPX files must include at least one track, at least one segment, at least two track
+points, numeric coordinates, and enough timestamps to compute a positive duration. If
+that data is missing, the import is marked `failed` with a clear
+`import_error_message`.
+
+## Duplicate Detection
+
+CSV duplicate detection compares existing `garmin_csv` workouts by:
 
 - workout date
-- start time
+- start time stored in deterministic notes
 - workout type
 - duration in minutes
 
-The workout table does not have a separate start-time column in CP07. The importer
-stores the CSV start time in a deterministic notes prefix so duplicates can be checked
-without changing the workout schema.
+TCX and GPX duplicate detection compares existing Garmin file imports by:
 
-## Import status
+- workout date
+- start time stored in deterministic notes
+- workout type
+- source (`garmin_tcx` or `garmin_gpx`)
+- duration in minutes when available
+- distance stored in deterministic notes when available
 
-CP07 adds two `imported_file` fields:
+Re-importing the same supported fixture does not create duplicate workouts. Duplicate
+rows or files are reported in the import summary as skipped duplicates.
+
+## Import Status
+
+Garmin import processors reuse the `imported_file` fields:
 
 - `import_status`
 - `import_error_message`
 
 Status values:
 
-- `not_imported`: raw file has been uploaded but not processed by the Garmin CSV
-  importer.
-- `imported`: CSV processing completed without malformed rows. This can include rows
-  skipped as duplicates.
-- `partial_failure`: at least one valid row was created or skipped as a duplicate, and
-  at least one malformed row was found.
-- `failed`: no valid rows were processed, or the file could not be processed as a
-  Garmin CSV import.
+- `not_imported`: raw file has been uploaded but not processed.
+- `imported`: processing completed without malformed rows or fatal parser errors. This
+  can include rows or files skipped as duplicates.
+- `partial_failure`: CSV processing created or skipped at least one valid row and found
+  at least one malformed row.
+- `failed`: no valid workout could be processed, the file type is not supported by the
+  chosen importer, or the file is malformed/incomplete.
 
-Malformed rows are not silently ignored. Row-level errors are shown in the import result
-summary and stored in `import_error_message`.
+Errors are shown in the import result summary and stored in `import_error_message`.
+Malformed data is not silently ignored.
+
+## Known Limitations
+
+- No FIT support.
+- No Garmin Connect API.
+- No route maps or charts.
+- No dashboard metrics or analytics.
+- No schema fields for start time, end time, distance, calories, or heart rate yet.
+  These values are stored in deterministic workout notes for CP08.

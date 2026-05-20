@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" version="1.1" creator="my_fitness_app_test">
+  <trk>
+    <name>Untimed walk</name>
+    <type>Walking</type>
+    <trkseg>
+      <trkpt lat="32.0800" lon="34.7800">
+        <ele>10.0</ele>
+      </trkpt>
+      <trkpt lat="32.0810" lon="34.7810">
+        <ele>11.0</ele>
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

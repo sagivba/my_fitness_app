@@ -8,11 +8,11 @@ The application is intended to collect and organize personal fitness, sleep, nut
 
 This repository currently contains the initialized Flask foundation for the app and a
 minimal SQLite persistence foundation with basic workout, sleep, daily log, manual
-meal data entry, raw activity file storage, and an initial Garmin CSV import path.
+meal data entry, raw activity file storage, and Garmin CSV/TCX/GPX import paths.
 
-The Garmin import foundation stores raw files and can import a small documented CSV
-format into workout records. It does not parse FIT, TCX, or GPX files and does not
-create derived metrics.
+The Garmin import foundation stores raw files and can import documented CSV, TCX, and
+GPX formats into workout records. It does not parse FIT files and does not create
+derived metrics.
 
 ## Initial scope
 
@@ -182,15 +182,15 @@ Each raw file is stored as `<sha256>.<ext>`. The app records only the existing
 type, import time, created time, and updated time. Duplicate uploads are detected by
 SHA-256 hash and do not create another physical file or database row.
 
-CSV files can be processed from the imported file detail page. The initial Garmin CSV
-import format and limitations are documented in:
+CSV, TCX, and GPX files can be processed from the imported file detail page. Supported
+Garmin import formats and limitations are documented in:
 
 ```text
 docs/garmin-imports.md
 ```
 
-FIT, TCX, GPX parsing, metric creation, Garmin Connect integration, dashboard metrics,
-and analytics remain future scope.
+FIT parsing, metric creation, Garmin Connect integration, dashboard metrics, and
+analytics remain future scope.
 
 ## SQLite persistence
 
