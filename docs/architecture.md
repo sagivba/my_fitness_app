@@ -55,6 +55,8 @@ Business logic.
 Services should be easy to test with unittest.
 
 Workout validation and application logic live in `services/workout_service.py`.
+Workout list/detail display preparation also lives there so routes stay thin and the
+workout intelligence table uses structured columns rather than parsing notes.
 Workout-linked strength training validation, exercise reuse, set numbering, and
 summary calculations live in `services/strength_service.py`.
 Sleep validation and application logic live in `services/sleep_service.py`.
@@ -68,8 +70,8 @@ Garmin TCX XML parsing, duplicate workout detection, workout creation, and impor
 status updates live in `services/garmin_tcx_import_service.py`.
 Garmin GPX XML parsing, distance calculation, duplicate workout detection, workout
 creation, and import status updates live in `services/garmin_gpx_import_service.py`.
-Mini dashboard aggregation from structured workout fields lives in
-`services/dashboard_service.py`.
+Mini dashboard aggregation and recent-workout display values from structured workout
+fields live in `services/dashboard_service.py`.
 
 ## src/my_fitness_app/model
 
@@ -121,6 +123,11 @@ using the existing workout table. Importers set workout `source` to `garmin_csv`
 `garmin_tcx`, or `garmin_gpx` and persist parsed metrics structurally where possible.
 Workout notes remain a deterministic, human-readable summary and legacy duplicate
 fallback only; dashboard metrics must not parse notes.
+
+The workout list renders a workout intelligence table prepared by the workout
+service. It includes structured Garmin metrics when available, manual/imported
+duration labels, missing-value dashes, and strength summaries from
+`strength_service.py`.
 
 FIT, Garmin Connect integration, advanced analytics, and charts remain future scope.
 

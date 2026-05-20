@@ -13,6 +13,16 @@ class DashboardBreakdownItem:
 
 
 @dataclass(frozen=True)
+class DashboardRecentWorkout:
+    id: int
+    workout_date: str
+    workout_type: str
+    source: str
+    duration: str
+    distance: str
+
+
+@dataclass(frozen=True)
 class WorkoutDashboardSummary:
     total_workouts: int
     total_duration_minutes: int
@@ -20,7 +30,7 @@ class WorkoutDashboardSummary:
     total_calories: int
     average_heart_rate: int | None
     max_heart_rate: int | None
-    recent_workouts: list[Workout]
+    recent_workouts: list[DashboardRecentWorkout]
     source_breakdown: list[DashboardBreakdownItem]
     workout_type_breakdown: list[DashboardBreakdownItem]
 
@@ -48,8 +58,8 @@ def get_workout_dashboard_summary(database_path: str | Path) -> WorkoutDashboard
             else None
         ),
         max_heart_rate=max(max_heart_rates) if max_heart_rates else None,
-        recent_workouts=workouts[:5],
-        source_breakdown=_breakdown(workout.source for workout in workouts),
+        recent_workouts=[_recent_workout(workout) for workout in workouts[:5]],
+        source_breakdown=_breakdown(_source_label(workout.source) for workout in workouts),
         workout_type_breakdown=_breakdown(workout.workout_type for workout in workouts),
     )
 
@@ -72,3 +82,38 @@ def _breakdown(values: Iterable[str | None]) -> list[DashboardBreakdownItem]:
         DashboardBreakdownItem(label=label, count=count)
         for label, count in sorted(counts.items(), key=lambda item: (-item[1], item[0]))
     ]
+
+
+def _recent_workout(workout: Workout) -> DashboardRecentWorkout:
+    return DashboardRecentWorkout(
+        id=workout.id,
+        workout_date=workout.workout_date,
+        workout_type=workout.workout_type,
+        source=_source_label(workout.source),
+        duration=_format_duration(workout),
+        distance=_format_distance(workout.distance_meters),
+    )
+
+
+def _source_label(source: str | None) -> str:
+    source_labels = {
+        "manual": "ידני",
+        "garmin_csv": "Garmin CSV",
+        "garmin_tcx": "Garmin TCX",
+        "garmin_gpx": "Garmin GPX",
+    }
+    return source_labels.get(source or "", source or "לא ידוע")
+
+
+def _format_duration(workout: Workout) -> str:
+    if workout.duration_seconds is not None:
+        return f"{round(workout.duration_seconds / 60)} דק׳"
+    if workout.duration_minutes is not None:
+        return f"{workout.duration_minutes} דק׳"
+    return "-"
+
+
+def _format_distance(distance_meters: float | None) -> str:
+    if distance_meters is None:
+        return "-"
+    return f"{distance_meters / 1000:.2f} ק״מ"

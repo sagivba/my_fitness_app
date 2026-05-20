@@ -1,32 +1,64 @@
-<!doctype html>
-<html lang="he" dir="rtl">
-<head>
-  <meta charset="utf-8">
-  <title>אימונים</title>
-  <link rel="stylesheet" href="/static/css/style.css">
-</head>
-<body>
-  <main class="container">
-    <h1>אימונים</h1>
-    <p><a href="/">דף הבית</a></p>
-    <p><a href="/workouts/new">הוספת אימון</a></p>
+{% extends "layout.html" %}
 
-    {% if workouts %}
-      <ul>
-        {% for workout in workouts %}
-          <li>
-            <a href="/workouts/{{ workout.id }}">
-              {{ workout.workout_date }} - {{ workout.workout_type }}
-            </a>
-            {% if workout.duration_minutes %}
-              <span>{{ workout.duration_minutes }} דקות</span>
-            {% endif %}
-          </li>
-        {% endfor %}
-      </ul>
-    {% else %}
-      <p>עדיין אין אימונים שמורים.</p>
-    {% endif %}
-  </main>
-</body>
-</html>
+{% block title %}אימונים{% endblock %}
+
+{% block content %}
+  <section class="page-heading">
+    <div>
+      <p class="eyebrow">יומן אימונים</p>
+      <h1>טבלת אימונים חכמה</h1>
+      <p class="lede">תצוגה מרוכזת של אימונים ידניים, מדדי Garmin ופרטי כוח מובנים.</p>
+    </div>
+    <div class="actions">
+      <a class="button" href="/workouts/new">הוספת אימון</a>
+      <a class="button button--secondary" href="/dashboard/">לוח מדדים</a>
+    </div>
+  </section>
+
+  {% if workout_rows %}
+    <section class="card">
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>תאריך</th>
+              <th>שעת התחלה</th>
+              <th>סוג אימון</th>
+              <th>מקור</th>
+              <th>משך</th>
+              <th>מרחק</th>
+              <th>קלוריות</th>
+              <th>דופק ממוצע</th>
+              <th>דופק מרבי</th>
+              <th>כוח</th>
+              <th>פעולה</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in workout_rows %}
+              <tr>
+                <td>{{ row.workout.workout_date }}</td>
+                <td>{{ row.metrics.start_time }}</td>
+                <td>{{ row.workout.workout_type }}</td>
+                <td>{{ row.metrics.source }}</td>
+                <td>{{ row.metrics.duration }}</td>
+                <td>{{ row.metrics.distance }}</td>
+                <td>{{ row.metrics.calories }}</td>
+                <td>{{ row.metrics.average_heart_rate }}</td>
+                <td>{{ row.metrics.max_heart_rate }}</td>
+                <td>{{ row.metrics.strength_summary }}</td>
+                <td><a class="table-action" href="/workouts/{{ row.workout.id }}">פרטים</a></td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  {% else %}
+    <section class="empty-state">
+      <h2>עדיין אין אימונים שמורים.</h2>
+      <p>אפשר להוסיף אימון ידני או לייבא קובץ פעילות.</p>
+      <a class="button" href="/workouts/new">הוספת אימון</a>
+    </section>
+  {% endif %}
+{% endblock %}

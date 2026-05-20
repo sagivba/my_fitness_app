@@ -1,52 +1,94 @@
-<!doctype html>
-<html lang="he" dir="rtl">
-<head>
-  <meta charset="utf-8">
-  <title>{{ workout.workout_type }}</title>
-  <link rel="stylesheet" href="/static/css/style.css">
-</head>
-<body>
-  <main class="container">
-    <h1>{{ workout.workout_type }}</h1>
-    <p><a href="/workouts/">חזרה לאימונים</a></p>
+{% extends "layout.html" %}
 
-    <dl>
-      <dt>תאריך</dt>
-      <dd>{{ workout.workout_date }}</dd>
+{% block title %}{{ workout.workout_type }}{% endblock %}
 
-      {% if workout.duration_minutes %}
+{% block content %}
+  <section class="page-heading">
+    <div>
+      <p class="eyebrow">פרטי אימון</p>
+      <h1>{{ workout.workout_type }}</h1>
+      <p class="lede">{{ workout.workout_date }} · {{ detail.metrics.source }}</p>
+    </div>
+    <div class="actions">
+      <a class="button button--secondary" href="/workouts/">חזרה לטבלה</a>
+    </div>
+  </section>
+
+  <section class="section-grid">
+    <article class="card">
+      <h2>פרטים בסיסיים</h2>
+      <dl class="detail-list">
+        <dt>תאריך</dt>
+        <dd>{{ workout.workout_date }}</dd>
+        <dt>שעת התחלה</dt>
+        <dd>{{ detail.metrics.start_time }}</dd>
         <dt>משך</dt>
-        <dd>{{ workout.duration_minutes }} דקות</dd>
-      {% endif %}
+        <dd>{{ detail.metrics.duration }}</dd>
+      </dl>
+    </article>
 
-      {% if workout.notes %}
-        <dt>הערות</dt>
-        <dd>{{ workout.notes }}</dd>
-      {% endif %}
-    </dl>
+    <article class="card">
+      <h2>מדדי Garmin</h2>
+      <dl class="detail-list">
+        <dt>מרחק</dt>
+        <dd>{{ detail.metrics.distance }}</dd>
+        <dt>קלוריות</dt>
+        <dd>{{ detail.metrics.calories }}</dd>
+        <dt>דופק ממוצע</dt>
+        <dd>{{ detail.metrics.average_heart_rate }}</dd>
+        <dt>דופק מרבי</dt>
+        <dd>{{ detail.metrics.max_heart_rate }}</dd>
+      </dl>
+    </article>
 
-    <section>
-      <h2>אימון כוח</h2>
+    <article class="card">
+      <h2>מקור וייבוא</h2>
+      <dl class="detail-list">
+        <dt>מקור</dt>
+        <dd>{{ detail.metrics.source }}</dd>
+        <dt>מזהה פעילות חיצוני</dt>
+        <dd>{{ workout.external_activity_id or "-" }}</dd>
+        <dt>תחילת נתון מובנה</dt>
+        <dd>{{ workout.start_time or "-" }}</dd>
+        <dt>סיום נתון מובנה</dt>
+        <dd>{{ workout.end_time or "-" }}</dd>
+      </dl>
+    </article>
+  </section>
 
-      <dl>
+  <section class="card">
+    <div class="section-title-row">
+      <div>
+        <h2>אימון כוח</h2>
+        <p class="muted">{{ detail.metrics.strength_summary }}</p>
+      </div>
+    </div>
+
+    <dl class="metric-grid">
+      <div>
         <dt>תרגילים</dt>
         <dd>{{ strength_summary.total_exercises }}</dd>
-
+      </div>
+      <div>
         <dt>סטים</dt>
         <dd>{{ strength_summary.total_sets }}</dd>
-
+      </div>
+      <div>
         <dt>חזרות</dt>
         <dd>{{ strength_summary.total_reps }}</dd>
-
+      </div>
+      <div>
         <dt>נפח כולל</dt>
-        <dd>{{ "%.2f"|format(strength_summary.total_volume_kg) }} ק"ג</dd>
-      </dl>
+        <dd>{{ "%.2f"|format(strength_summary.total_volume_kg) }} ק״ג</dd>
+      </div>
+    </dl>
 
-      {% if strength_exercises %}
-        {% for exercise in strength_exercises %}
-          <h3>{{ exercise.exercise_order }}. {{ exercise.exercise_name }}</h3>
-          {% if exercise.sets %}
-            <table>
+    {% if strength_exercises %}
+      {% for exercise in strength_exercises %}
+        <h3>{{ exercise.exercise_order }}. {{ exercise.exercise_name }}</h3>
+        {% if exercise.sets %}
+          <div class="table-wrap">
+            <table class="data-table">
               <thead>
                 <tr>
                   <th>סט</th>
@@ -63,33 +105,29 @@
                     <td>{{ strength_set.reps }}</td>
                     <td>
                       {% if strength_set.weight_kg is not none %}
-                        {{ strength_set.weight_kg }} ק"ג
+                        {{ strength_set.weight_kg }} ק״ג
                       {% else %}
                         ללא משקל
                       {% endif %}
                     </td>
-                    <td>
-                      {% if strength_set.perceived_effort %}
-                        {{ strength_set.perceived_effort }}
-                      {% else %}
-                        -
-                      {% endif %}
-                    </td>
+                    <td>{{ strength_set.perceived_effort or "-" }}</td>
                     <td>{{ strength_set.notes or "-" }}</td>
                   </tr>
                 {% endfor %}
               </tbody>
             </table>
-          {% endif %}
-        {% endfor %}
-      {% else %}
-        <p>עדיין אין פרטי כוח לאימון הזה.</p>
-      {% endif %}
+          </div>
+        {% endif %}
+      {% endfor %}
+    {% else %}
+      <p class="empty-inline">עדיין אין פרטי כוח לאימון הזה.</p>
+    {% endif %}
 
-      <h3>הוספת סט כוח</h3>
-      <form method="post" action="/workouts/{{ workout.id }}/strength-sets">
-        <p>
-          <label for="exercise_name">שם תרגיל</label><br>
+    <h3>הוספת סט כוח</h3>
+    <form class="form form--compact" method="post" action="/workouts/{{ workout.id }}/strength-sets">
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="exercise_name">שם תרגיל</label>
           <input
             id="exercise_name"
             name="exercise_name"
@@ -99,10 +137,10 @@
           {% if strength_errors.get("exercise_name") %}
             <span class="error">{{ strength_errors["exercise_name"] }}</span>
           {% endif %}
-        </p>
+        </div>
 
-        <p>
-          <label for="reps">חזרות</label><br>
+        <div class="form-group">
+          <label for="reps">חזרות</label>
           <input
             id="reps"
             name="reps"
@@ -114,10 +152,10 @@
           {% if strength_errors.get("reps") %}
             <span class="error">{{ strength_errors["reps"] }}</span>
           {% endif %}
-        </p>
+        </div>
 
-        <p>
-          <label for="weight_kg">משקל בק"ג</label><br>
+        <div class="form-group">
+          <label for="weight_kg">משקל בק״ג</label>
           <input
             id="weight_kg"
             name="weight_kg"
@@ -129,10 +167,10 @@
           {% if strength_errors.get("weight_kg") %}
             <span class="error">{{ strength_errors["weight_kg"] }}</span>
           {% endif %}
-        </p>
+        </div>
 
-        <p>
-          <label for="perceived_effort">מאמץ נתפס</label><br>
+        <div class="form-group">
+          <label for="perceived_effort">מאמץ נתפס</label>
           <input
             id="perceived_effort"
             name="perceived_effort"
@@ -144,16 +182,20 @@
           {% if strength_errors.get("perceived_effort") %}
             <span class="error">{{ strength_errors["perceived_effort"] }}</span>
           {% endif %}
-        </p>
+        </div>
+      </div>
 
-        <p>
-          <label for="strength_notes">הערות</label><br>
-          <textarea id="strength_notes" name="notes" rows="3">{{ strength_values.get('notes', '') }}</textarea>
-        </p>
+      <div class="form-group">
+        <label for="strength_notes">הערות</label>
+        <textarea id="strength_notes" name="notes" rows="3">{{ strength_values.get('notes', '') }}</textarea>
+      </div>
 
-        <button type="submit">הוספת סט</button>
-      </form>
-    </section>
-  </main>
-</body>
-</html>
+      <button type="submit">הוספת סט</button>
+    </form>
+  </section>
+
+  <section class="card">
+    <h2>הערות</h2>
+    <p>{{ workout.notes or "אין הערות." }}</p>
+  </section>
+{% endblock %}

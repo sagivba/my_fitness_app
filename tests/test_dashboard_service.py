@@ -52,9 +52,11 @@ class TestDashboardService(TestCase):
         self.assertEqual(summary.max_heart_rate, 173)
         self.assertEqual(
             [item.label for item in summary.source_breakdown],
-            ["garmin_tcx", "manual"],
+            ["Garmin TCX", "ידני"],
         )
         self.assertEqual(summary.recent_workouts[0].workout_date, "2026-05-20")
+        self.assertEqual(summary.recent_workouts[0].duration, "40 דק׳")
+        self.assertEqual(summary.recent_workouts[0].distance, "6.20 ק״מ")
 
     def test_dashboard_summary_does_not_parse_workout_notes(self):
         create_workout(

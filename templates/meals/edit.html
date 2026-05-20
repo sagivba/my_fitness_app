@@ -1,16 +1,20 @@
-<!doctype html>
-<html lang="he" dir="rtl">
-<head>
-  <meta charset="utf-8">
-  <title>עריכת ארוחה</title>
-  <link rel="stylesheet" href="/static/css/style.css">
-</head>
-<body>
-  <main class="container">
-    <h1>עריכת ארוחה</h1>
-    <p><a href="/meals/{{ meal.id }}">חזרה לארוחה</a></p>
+{% extends "layout.html" %}
 
-    <form method="post" action="/meals/{{ meal.id }}">
+{% block title %}עריכת ארוחה{% endblock %}
+
+{% block content %}
+  <section class="page-heading">
+    <div>
+      <p class="eyebrow">תזונה ידנית</p>
+      <h1>עריכת ארוחה</h1>
+    </div>
+    <div class="actions">
+      <a class="button button--secondary" href="/meals/{{ meal.id }}">חזרה לארוחה</a>
+    </div>
+  </section>
+
+  <section class="card">
+    <form class="form" method="post" action="/meals/{{ meal.id }}">
       <p>
         <label for="meal_date">תאריך ארוחה</label><br>
         <input
@@ -132,6 +136,5 @@
 
       <button type="submit">שמירה</button>
     </form>
-  </main>
-</body>
-</html>
+  </section>
+{% endblock %}

@@ -1,37 +1,44 @@
-<!doctype html>
-<html lang="he" dir="rtl">
-<head>
-  <meta charset="utf-8">
-  <title>{{ imported_file.original_filename }}</title>
-  <link rel="stylesheet" href="/static/css/style.css">
-</head>
-<body>
-  <main class="container">
-    <h1>{{ imported_file.original_filename }}</h1>
-    <p><a href="/imports/">חזרה לייבוא קבצים</a></p>
+{% extends "layout.html" %}
+
+{% block title %}{{ imported_file.original_filename }}{% endblock %}
+
+{% block content %}
+  <section class="page-heading">
+    <div>
+      <p class="eyebrow">קובץ פעילות</p>
+      <h1>{{ imported_file.original_filename }}</h1>
+    </div>
+    <div class="actions">
+      <a class="button button--secondary" href="/imports/">חזרה לייבוא קבצים</a>
+    </div>
+  </section>
 
     {% if is_duplicate %}
-      <p>הקובץ כבר נשמר בעבר. לא נוצר עותק נוסף.</p>
+      <p class="alert">הקובץ כבר נשמר בעבר. לא נוצר עותק נוסף.</p>
     {% endif %}
 
-    {% if imported_file.file_type == "csv" %}
-      <form method="post" action="/imports/{{ imported_file.id }}/garmin-csv-import">
-        <button type="submit">ייבוא Garmin CSV</button>
-      </form>
-    {% elif imported_file.file_type == "tcx" %}
-      <form method="post" action="/imports/{{ imported_file.id }}/garmin-tcx-import">
-        <button type="submit">ייבוא Garmin TCX</button>
-      </form>
-    {% elif imported_file.file_type == "gpx" %}
-      <form method="post" action="/imports/{{ imported_file.id }}/garmin-gpx-import">
-        <button type="submit">ייבוא Garmin GPX</button>
-      </form>
-    {% endif %}
+  <section class="card">
+    <div class="actions">
+      {% if imported_file.file_type == "csv" %}
+        <form method="post" action="/imports/{{ imported_file.id }}/garmin-csv-import">
+          <button type="submit">ייבוא Garmin CSV</button>
+        </form>
+      {% elif imported_file.file_type == "tcx" %}
+        <form method="post" action="/imports/{{ imported_file.id }}/garmin-tcx-import">
+          <button type="submit">ייבוא Garmin TCX</button>
+        </form>
+      {% elif imported_file.file_type == "gpx" %}
+        <form method="post" action="/imports/{{ imported_file.id }}/garmin-gpx-import">
+          <button type="submit">ייבוא Garmin GPX</button>
+        </form>
+      {% endif %}
+    </div>
+  </section>
 
     {% if import_result %}
-      <section>
+      <section class="card">
         <h2>סיכום ייבוא</h2>
-        <dl>
+        <dl class="detail-list">
           <dt>שורות שנקראו</dt>
           <dd>{{ import_result.rows_read }}</dd>
 
@@ -59,7 +66,8 @@
       </section>
     {% endif %}
 
-    <dl>
+  <section class="card">
+    <dl class="detail-list">
       <dt>שם קובץ מקורי</dt>
       <dd>{{ imported_file.original_filename }}</dd>
 
@@ -89,6 +97,5 @@
       <dt>עודכן בתאריך</dt>
       <dd>{{ imported_file.updated_at }}</dd>
     </dl>
-  </main>
-</body>
-</html>
+  </section>
+{% endblock %}

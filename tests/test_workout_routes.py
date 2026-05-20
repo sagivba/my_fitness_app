@@ -4,6 +4,8 @@ from unittest import TestCase
 
 from my_fitness_app.app import create_app
 from my_fitness_app.config import AppConfig
+from my_fitness_app.model.workout import NewWorkout
+from my_fitness_app.model.workout_repository import create_workout as create_workout_record
 from my_fitness_app.services.workout_service import create_workout
 
 
@@ -42,6 +44,56 @@ class TestWorkoutRoutes(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn(b"2026-05-20", response.data)
         self.assertIn(b"Walking", response.data)
+        self.assertIn("טבלת אימונים חכמה".encode(), response.data)
+        self.assertIn("45 דק׳ (ידני)".encode(), response.data)
+
+    def test_workout_table_renders_structured_garmin_metrics(self):
+        create_workout_record(
+            self.database_path,
+            NewWorkout(
+                workout_date="2026-05-20",
+                workout_type="Running",
+                duration_minutes=40,
+                notes="Distance meters: 999999.00",
+                source="garmin_tcx",
+                start_time="2026-05-20T06:45:00Z",
+                duration_seconds=2400,
+                distance_meters=6200,
+                calories=410,
+                average_heart_rate=146,
+                max_heart_rate=173,
+            ),
+        )
+
+        response = self.client.get("/workouts/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b"06:45", response.data)
+        self.assertIn(b"Garmin TCX", response.data)
+        self.assertIn("40 דק׳ (מקובץ Garmin)".encode(), response.data)
+        self.assertIn("6.20 ק״מ".encode(), response.data)
+        self.assertIn(b"410", response.data)
+        self.assertIn(b"146", response.data)
+        self.assertIn(b"173", response.data)
+        self.assertNotIn(b"999999", response.data)
+
+    def test_workout_table_shows_missing_metrics_as_dash(self):
+        create_workout(
+            self.database_path,
+            {
+                "workout_date": "2026-05-20",
+                "workout_type": "Mobility",
+                "duration_minutes": "",
+                "notes": "",
+            },
+        )
+
+        response = self.client.get("/workouts/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b"Mobility", response.data)
+        self.assertIn("ידני".encode(), response.data)
+        self.assertGreaterEqual(response.data.count(b">-<"), 5)
 
     def test_new_workout_page_shows_form(self):
         response = self.client.get("/workouts/new")
@@ -119,7 +171,64 @@ class TestWorkoutRoutes(TestCase):
         self.assertIn("אימון כוח".encode(), response.data)
         self.assertIn(b"Squat", response.data)
         self.assertIn(b"80.0", response.data)
-        self.assertIn('400.00 ק"ג'.encode(), response.data)
+        self.assertIn("400.00 ק״ג".encode(), response.data)
+
+    def test_workout_table_shows_strength_summary(self):
+        workout = create_workout(
+            self.database_path,
+            {
+                "workout_date": "2026-05-20",
+                "workout_type": "Gym",
+                "duration_minutes": "45",
+                "notes": "",
+            },
+        )
+        self.client.post(
+            f"/workouts/{workout.id}/strength-sets",
+            data={
+                "exercise_name": "Squat",
+                "reps": "5",
+                "weight_kg": "80",
+                "perceived_effort": "",
+                "notes": "",
+            },
+        )
+
+        response = self.client.get("/workouts/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("1 תרגילים · 1 סטים · 5 חזרות · 400.00 ק״ג".encode(), response.data)
+
+    def test_workout_detail_organizes_garmin_metrics_and_source_info(self):
+        workout = create_workout_record(
+            self.database_path,
+            NewWorkout(
+                workout_date="2026-05-20",
+                workout_type="Running",
+                duration_minutes=40,
+                notes=None,
+                source="garmin_gpx",
+                start_time="2026-05-20T06:45:00Z",
+                end_time="2026-05-20T07:25:00Z",
+                duration_seconds=2400,
+                distance_meters=6200,
+                calories=410,
+                average_heart_rate=146,
+                max_heart_rate=173,
+                external_activity_id="activity-1",
+            ),
+        )
+
+        response = self.client.get(f"/workouts/{workout.id}")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("פרטים בסיסיים".encode(), response.data)
+        self.assertIn("מדדי Garmin".encode(), response.data)
+        self.assertIn("מקור וייבוא".encode(), response.data)
+        self.assertIn(b"Garmin GPX", response.data)
+        self.assertIn(b"activity-1", response.data)
+        self.assertIn("6.20 ק״מ".encode(), response.data)
+        self.assertIn("40 דק׳ (מקובץ Garmin)".encode(), response.data)
 
     def test_post_valid_strength_set_creates_record_and_redirects(self):
         workout = create_workout(

@@ -1,32 +1,30 @@
-<!doctype html>
-<html lang="he" dir="rtl">
-<head>
-  <meta charset="utf-8">
-  <title>העלאת קובץ ייבוא</title>
-  <link rel="stylesheet" href="/static/css/style.css">
-</head>
-<body>
-  <main class="container">
-    <h1>העלאת קובץ ייבוא</h1>
-    <p><a href="/imports/">חזרה לייבוא קבצים</a></p>
+{% extends "layout.html" %}
 
-    <form method="post" action="/imports/" enctype="multipart/form-data">
-      <p>
-        <label for="file">קובץ פעילות</label><br>
-        <input
-          id="file"
-          name="file"
-          type="file"
-          accept=".csv,.tcx,.gpx,.fit"
-          required
-        >
+{% block title %}העלאת קובץ ייבוא{% endblock %}
+
+{% block content %}
+  <section class="page-heading">
+    <div>
+      <p class="eyebrow">ייבוא פעילות</p>
+      <h1>העלאת קובץ ייבוא</h1>
+      <p class="lede">קבצי CSV, TCX, GPX ו-FIT נשמרים כקבצי מקור. עיבוד נתונים זמין לקבצים נתמכים.</p>
+    </div>
+    <div class="actions">
+      <a class="button button--secondary" href="/imports/">חזרה לייבוא קבצים</a>
+    </div>
+  </section>
+
+  <section class="card">
+    <form class="form" method="post" action="/imports/" enctype="multipart/form-data">
+      <div class="form-group">
+        <label for="file">קובץ פעילות</label>
+        <input id="file" name="file" type="file" accept=".csv,.tcx,.gpx,.fit" required>
         {% if errors.get("file") %}
           <span class="error">{{ errors["file"] }}</span>
         {% endif %}
-      </p>
+      </div>
 
       <button type="submit">העלאה</button>
     </form>
-  </main>
-</body>
-</html>
+  </section>
+{% endblock %}

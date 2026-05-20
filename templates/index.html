@@ -1,21 +1,32 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <title>My Fitness App</title>
-  <link rel="stylesheet" href="/static/css/style.css">
-</head>
-<body>
-  <main class="container">
-    <h1>{{ message }}</h1>
-    <p>The application is running.</p>
-    <p><a href="/dashboard/">לוח מדדים</a></p>
-    <p><a href="/workouts/">אימונים</a></p>
-    <p><a href="/sleep/">שינה</a></p>
-    <p><a href="/daily-logs/">יומן יומי</a></p>
-    <p><a href="/meals/">ארוחות</a></p>
-    <p><a href="/imports/">ייבוא קבצים</a></p>
-    <p><a href="/api/health">Health endpoint</a></p>
-  </main>
-</body>
-</html>
+{% extends "layout.html" %}
+
+{% block title %}My Fitness App{% endblock %}
+
+{% block content %}
+  <section class="page-heading">
+    <div>
+      <p class="eyebrow">איסוף נתוני כושר אישי</p>
+      <h1>{{ message }}</h1>
+      <p class="lede">אימונים, כוח, שינה, ארוחות וייבוא Garmin במקום אחד.</p>
+    </div>
+  </section>
+
+  <section class="grid grid--cards">
+    <a class="card card--link" href="/workouts/">
+      <span class="card__title">אימונים</span>
+      <span class="card__body">טבלת אימונים, מדדי Garmin ופרטי כוח.</span>
+    </a>
+    <a class="card card--link" href="/dashboard/">
+      <span class="card__title">לוח מדדים</span>
+      <span class="card__body">סיכום מהיר מנתונים מובנים בלבד.</span>
+    </a>
+    <a class="card card--link" href="/imports/">
+      <span class="card__title">ייבוא קבצים</span>
+      <span class="card__body">שמירת קבצי CSV, TCX, GPX ו-FIT.</span>
+    </a>
+    <a class="card card--link" href="/api/health">
+      <span class="card__title">Health endpoint</span>
+      <span class="card__body">בדיקת זמינות בסיסית.</span>
+    </a>
+  </section>
+{% endblock %}

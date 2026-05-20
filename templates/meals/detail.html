@@ -1,59 +1,41 @@
-<!doctype html>
-<html lang="he" dir="rtl">
-<head>
-  <meta charset="utf-8">
-  <title>{{ meal.meal_type }} {{ meal.meal_date }}</title>
-  <link rel="stylesheet" href="/static/css/style.css">
-</head>
-<body>
-  <main class="container">
-    <h1>{{ meal.meal_type }} {{ meal.meal_date }}</h1>
-    <p><a href="/meals/">חזרה לארוחות</a></p>
-    <p><a href="/meals/{{ meal.id }}/edit">עריכת ארוחה</a></p>
+{% extends "layout.html" %}
 
-    <dl>
+{% block title %}{{ meal.meal_type }} {{ meal.meal_date }}{% endblock %}
+
+{% block content %}
+  <section class="page-heading">
+    <div>
+      <p class="eyebrow">ארוחה</p>
+      <h1>{{ meal.meal_type }} {{ meal.meal_date }}</h1>
+    </div>
+    <div class="actions">
+      <a class="button" href="/meals/{{ meal.id }}/edit">עריכת ארוחה</a>
+      <a class="button button--secondary" href="/meals/">חזרה לארוחות</a>
+    </div>
+  </section>
+
+  <section class="card">
+    <dl class="detail-list">
       <dt>תאריך</dt>
       <dd>{{ meal.meal_date }}</dd>
-
       <dt>סוג ארוחה</dt>
       <dd>{{ meal.meal_type }}</dd>
-
       <dt>תיאור</dt>
       <dd>{{ meal.description }}</dd>
-
-      {% if meal.calories %}
-        <dt>קלוריות</dt>
-        <dd>{{ meal.calories }}</dd>
-      {% endif %}
-
-      {% if meal.protein_grams %}
-        <dt>חלבון</dt>
-        <dd>{{ meal.protein_grams }} גרם</dd>
-      {% endif %}
-
-      {% if meal.carbs_grams %}
-        <dt>פחמימות</dt>
-        <dd>{{ meal.carbs_grams }} גרם</dd>
-      {% endif %}
-
-      {% if meal.fat_grams %}
-        <dt>שומן</dt>
-        <dd>{{ meal.fat_grams }} גרם</dd>
-      {% endif %}
-
-      {% if meal.fiber_grams %}
-        <dt>סיבים</dt>
-        <dd>{{ meal.fiber_grams }} גרם</dd>
-      {% endif %}
-
+      <dt>קלוריות</dt>
+      <dd>{{ meal.calories or "-" }}</dd>
+      <dt>חלבון</dt>
+      <dd>{% if meal.protein_grams %}{{ meal.protein_grams }} גרם{% else %}-{% endif %}</dd>
+      <dt>פחמימות</dt>
+      <dd>{% if meal.carbs_grams %}{{ meal.carbs_grams }} גרם{% else %}-{% endif %}</dd>
+      <dt>שומן</dt>
+      <dd>{% if meal.fat_grams %}{{ meal.fat_grams }} גרם{% else %}-{% endif %}</dd>
+      <dt>סיבים</dt>
+      <dd>{% if meal.fiber_grams %}{{ meal.fiber_grams }} גרם{% else %}-{% endif %}</dd>
       <dt>מקור</dt>
       <dd>{{ meal.source }}</dd>
-
-      {% if meal.notes %}
-        <dt>הערות</dt>
-        <dd>{{ meal.notes }}</dd>
-      {% endif %}
+      <dt>הערות</dt>
+      <dd>{{ meal.notes or "-" }}</dd>
     </dl>
-  </main>
-</body>
-</html>
+  </section>
+{% endblock %}

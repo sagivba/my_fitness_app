@@ -12,8 +12,8 @@ workouts_bp = Blueprint("workouts", __name__, url_prefix="/workouts")
 
 @workouts_bp.get("/")
 def list_workouts():
-    workouts = workout_service.list_workouts(current_app.config["DATABASE_PATH"])
-    return render_template("workouts/list.html", workouts=workouts)
+    rows = workout_service.list_workout_table_rows(current_app.config["DATABASE_PATH"])
+    return render_template("workouts/list.html", workout_rows=rows)
 
 
 @workouts_bp.get("/new")
@@ -37,10 +37,13 @@ def create_workout():
 
 @workouts_bp.get("/<int:workout_id>")
 def get_workout(workout_id: int):
-    workout = workout_service.get_workout(current_app.config["DATABASE_PATH"], workout_id)
-    if workout is None:
+    detail = workout_service.get_workout_detail_view(
+        current_app.config["DATABASE_PATH"],
+        workout_id,
+    )
+    if detail is None:
         abort(404)
-    return _render_workout_detail(workout)
+    return _render_workout_detail(detail)
 
 
 @workouts_bp.post("/<int:workout_id>/strength-sets")
@@ -55,12 +58,15 @@ def create_strength_set(workout_id: int):
     except StrengthWorkoutNotFoundError:
         abort(404)
     except StrengthValidationError as error:
-        workout = workout_service.get_workout(current_app.config["DATABASE_PATH"], workout_id)
-        if workout is None:
+        detail = workout_service.get_workout_detail_view(
+            current_app.config["DATABASE_PATH"],
+            workout_id,
+        )
+        if detail is None:
             abort(404)
         return (
             _render_workout_detail(
-                workout,
+                detail,
                 strength_errors=error.errors,
                 strength_values=values,
             ),
@@ -71,20 +77,16 @@ def create_strength_set(workout_id: int):
 
 
 def _render_workout_detail(
-    workout,
+    detail,
     strength_errors: dict[str, str] | None = None,
     strength_values: dict[str, str] | None = None,
 ):
-    exercises = strength_service.list_strength_exercises(
-        current_app.config["DATABASE_PATH"],
-        workout.id,
-    )
-    summary = strength_service.summarize_strength_exercises(exercises)
     return render_template(
         "workouts/detail.html",
-        workout=workout,
-        strength_exercises=exercises,
-        strength_summary=summary,
+        detail=detail,
+        workout=detail.workout,
+        strength_exercises=detail.strength_exercises,
+        strength_summary=detail.strength_summary,
         strength_errors=strength_errors or {},
         strength_values=strength_values or {},
     )
