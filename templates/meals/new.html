@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <title>הוספת ארוחה</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <main class="container">
+    <h1>הוספת ארוחה</h1>
+    <p><a href="/meals/">חזרה לארוחות</a></p>
+
+    <form method="post" action="/meals/">
+      <p>
+        <label for="meal_date">תאריך ארוחה</label><br>
+        <input
+          id="meal_date"
+          name="meal_date"
+          type="date"
+          value="{{ values.get('meal_date', '') }}"
+          required
+        >
+        {% if errors.get("meal_date") %}
+          <span class="error">{{ errors["meal_date"] }}</span>
+        {% endif %}
+      </p>
+
+      <p>
+        <label for="meal_type">סוג ארוחה</label><br>
+        <input
+          id="meal_type"
+          name="meal_type"
+          value="{{ values.get('meal_type', '') }}"
+          required
+        >
+        {% if errors.get("meal_type") %}
+          <span class="error">{{ errors["meal_type"] }}</span>
+        {% endif %}
+      </p>
+
+      <p>
+        <label for="description">תיאור</label><br>
+        <textarea
+          id="description"
+          name="description"
+          rows="4"
+          required
+        >{{ values.get('description', '') }}</textarea>
+        {% if errors.get("description") %}
+          <span class="error">{{ errors["description"] }}</span>
+        {% endif %}
+      </p>
+
+      <p>
+        <label for="calories">קלוריות</label><br>
+        <input
+          id="calories"
+          name="calories"
+          type="number"
+          min="1"
+          value="{{ values.get('calories', '') }}"
+        >
+        {% if errors.get("calories") %}
+          <span class="error">{{ errors["calories"] }}</span>
+        {% endif %}
+      </p>
+
+      <p>
+        <label for="protein_grams">חלבון בגרמים</label><br>
+        <input
+          id="protein_grams"
+          name="protein_grams"
+          type="number"
+          min="0.1"
+          step="0.1"
+          value="{{ values.get('protein_grams', '') }}"
+        >
+        {% if errors.get("protein_grams") %}
+          <span class="error">{{ errors["protein_grams"] }}</span>
+        {% endif %}
+      </p>
+
+      <p>
+        <label for="carbs_grams">פחמימות בגרמים</label><br>
+        <input
+          id="carbs_grams"
+          name="carbs_grams"
+          type="number"
+          min="0.1"
+          step="0.1"
+          value="{{ values.get('carbs_grams', '') }}"
+        >
+        {% if errors.get("carbs_grams") %}
+          <span class="error">{{ errors["carbs_grams"] }}</span>
+        {% endif %}
+      </p>
+
+      <p>
+        <label for="fat_grams">שומן בגרמים</label><br>
+        <input
+          id="fat_grams"
+          name="fat_grams"
+          type="number"
+          min="0.1"
+          step="0.1"
+          value="{{ values.get('fat_grams', '') }}"
+        >
+        {% if errors.get("fat_grams") %}
+          <span class="error">{{ errors["fat_grams"] }}</span>
+        {% endif %}
+      </p>
+
+      <p>
+        <label for="fiber_grams">סיבים בגרמים</label><br>
+        <input
+          id="fiber_grams"
+          name="fiber_grams"
+          type="number"
+          min="0.1"
+          step="0.1"
+          value="{{ values.get('fiber_grams', '') }}"
+        >
+        {% if errors.get("fiber_grams") %}
+          <span class="error">{{ errors["fiber_grams"] }}</span>
+        {% endif %}
+      </p>
+
+      <p>
+        <label for="notes">הערות</label><br>
+        <textarea id="notes" name="notes" rows="4">{{ values.get('notes', '') }}</textarea>
+      </p>
+
+      <button type="submit">שמירה</button>
+    </form>
+  </main>
+</body>
+</html>

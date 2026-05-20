@@ -41,6 +41,8 @@ Current web route groups:
 - `workouts.py` handles workout list, create form, create submit, and detail pages.
 - `sleep.py` handles sleep log list, create form, create submit, and detail pages.
 - `daily_logs.py` handles daily log list, create form, create submit, and detail pages.
+- `meals.py` handles meal list, create form, create submit, detail, edit form, and
+  update submit pages.
 
 ## src/my_fitness_app/services
 
@@ -51,6 +53,7 @@ Services should be easy to test with unittest.
 Workout validation and application logic live in `services/workout_service.py`.
 Sleep validation and application logic live in `services/sleep_service.py`.
 Daily log validation and application logic live in `services/daily_log_service.py`.
+Meal validation and application logic live in `services/meal_service.py`.
 
 ## src/my_fitness_app/model
 
@@ -64,7 +67,11 @@ SQLite persistence foundation:
 - `model/workout_repository.py` contains workout persistence operations.
 - `model/sleep_repository.py` contains sleep log persistence operations.
 - `model/daily_log_repository.py` contains daily log persistence operations.
+- `model/meal_repository.py` contains meal persistence operations.
 - Route handlers must not call SQLite directly.
+
+Meal logging currently uses only existing `meal` table fields. AI nutrition analysis,
+image upload, `meal_time`, and `recipe_url` are future scope.
 
 ## src/my_fitness_app/utils
 

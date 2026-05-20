@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <title>{{ meal.meal_type }} {{ meal.meal_date }}</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <main class="container">
+    <h1>{{ meal.meal_type }} {{ meal.meal_date }}</h1>
+    <p><a href="/meals/">חזרה לארוחות</a></p>
+    <p><a href="/meals/{{ meal.id }}/edit">עריכת ארוחה</a></p>
+
+    <dl>
+      <dt>תאריך</dt>
+      <dd>{{ meal.meal_date }}</dd>
+
+      <dt>סוג ארוחה</dt>
+      <dd>{{ meal.meal_type }}</dd>
+
+      <dt>תיאור</dt>
+      <dd>{{ meal.description }}</dd>
+
+      {% if meal.calories %}
+        <dt>קלוריות</dt>
+        <dd>{{ meal.calories }}</dd>
+      {% endif %}
+
+      {% if meal.protein_grams %}
+        <dt>חלבון</dt>
+        <dd>{{ meal.protein_grams }} גרם</dd>
+      {% endif %}
+
+      {% if meal.carbs_grams %}
+        <dt>פחמימות</dt>
+        <dd>{{ meal.carbs_grams }} גרם</dd>
+      {% endif %}
+
+      {% if meal.fat_grams %}
+        <dt>שומן</dt>
+        <dd>{{ meal.fat_grams }} גרם</dd>
+      {% endif %}
+
+      {% if meal.fiber_grams %}
+        <dt>סיבים</dt>
+        <dd>{{ meal.fiber_grams }} גרם</dd>
+      {% endif %}
+
+      <dt>מקור</dt>
+      <dd>{{ meal.source }}</dd>
+
+      {% if meal.notes %}
+        <dt>הערות</dt>
+        <dd>{{ meal.notes }}</dd>
+      {% endif %}
+    </dl>
+  </main>
+</body>
+</html>
