@@ -1,0 +1,856 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>אפיון אפליקציית ספורט אישית - My Fitness App</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.7;
+      margin: 0;
+      background: #f7f7f7;
+      color: #222;
+    }
+    main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 32px 20px 64px;
+      background: #fff;
+    }
+    h1, h2, h3 {
+      line-height: 1.3;
+      margin-top: 1.4em;
+    }
+    h1 {
+      font-size: 2rem;
+      border-bottom: 3px solid #222;
+      padding-bottom: 12px;
+    }
+    h2 {
+      font-size: 1.45rem;
+      border-bottom: 1px solid #ccc;
+      padding-bottom: 6px;
+    }
+    h3 {
+      font-size: 1.15rem;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px 10px;
+      vertical-align: top;
+    }
+    th {
+      background: #f0f0f0;
+    }
+    code, pre {
+      direction: ltr;
+      text-align: left;
+      font-family: Consolas, monospace;
+    }
+    pre {
+      background: #f4f4f4;
+      padding: 14px;
+      overflow-x: auto;
+      border: 1px solid #ddd;
+    }
+    .note {
+      background: #fff8dc;
+      border: 1px solid #eadc94;
+      padding: 12px 14px;
+      margin: 16px 0;
+    }
+    .decision {
+      background: #eef7ee;
+      border: 1px solid #b7d7b7;
+      padding: 12px 14px;
+      margin: 16px 0;
+    }
+    .future {
+      background: #eef4ff;
+      border: 1px solid #bdd2ff;
+      padding: 12px 14px;
+      margin: 16px 0;
+    }
+  </style>
+</head>
+<body>
+<main>
+
+<h1>אפיון אפליקציית ספורט אישית - My Fitness App</h1>
+
+<section>
+  <h2>1. מטרת המערכת</h2>
+  <p>
+    המערכת מיועדת לאיסוף, תיעוד וניתוח נתוני כושר, פעילות, תזונה ושינה של משתמש יחיד,
+    עם דגש על בניית בסיס נתונים נקי, עקבי וניתן להרחבה.
+  </p>
+  <p>
+    בשלב הראשון המערכת לא תנסה להסיק מסקנות מורכבות או לבצע ניתוחי קורלציה מלאים.
+    מטרת ה-MVP היא ליצור תשתית אמינה לאיסוף נתונים: אימונים, נתוני Garmin, תיעוד אוכל,
+    שינה, תחושות, הערות ומדדים ידניים בסיסיים.
+  </p>
+  <div class="decision">
+    <strong>החלטת MVP:</strong>
+    קודם בונים מערכת איסוף נתונים אישית, מקומית, פשוטה ומדויקת.
+    ניתוח קשרים בין אימונים, אוכל ושינה ייבנה רק לאחר שיצטברו נתונים איכותיים.
+  </div>
+</section>
+
+<section>
+  <h2>2. משמעות "אפליקציה אישית שרצה מקומית"</h2>
+  <p>
+    אפליקציה מקומית היא אפליקציית Web רגילה מבחינת חוויית המשתמש,
+    אבל היא אינה מפורסמת לאינטרנט ואינה מותקנת בשרת ציבורי.
+    היא רצה על המחשב שלך, למשל דרך Flask או Docker, ונפתחת בדפדפן בכתובת כמו:
+  </p>
+  <pre><code>http://127.0.0.1:5000</code></pre>
+  <p>
+    המשמעות המעשית:
+  </p>
+  <ul>
+    <li>הנתונים נשמרים אצלך, למשל בקובץ SQLite מקומי או בבסיס נתונים מקומי.</li>
+    <li>אין צורך בשלב הראשון במנגנון משתמשים, הרשאות, סיסמאות, SSL או deployment.</li>
+    <li>אפשר לפתח מהר יותר, לבדוק מהר יותר, ולשמור על פרטיות טובה יותר.</li>
+    <li>בהמשך ניתן להפוך אותה לאפליקציה רשתית מלאה, אם תרצה גישה מטלפון או ממחשבים אחרים.</li>
+  </ul>
+  <p>
+    בשלב הראשון, גם אם הממשק נראה כמו אתר, הוא מיועד לשימוש אישי בלבד.
+  </p>
+</section>
+
+<section>
+  <h2>3. קהל יעד והנחות עבודה</h2>
+  <ul>
+    <li>משתמש יחיד.</li>
+    <li>שעון Garmin Vivoactive.</li>
+    <li>אימונים עיקריים: אימוני כוח בחוץ, אימון מכון משולב אירובי וכוח, אליפטיקל, הליכה, אופניים.</li>
+    <li>משך אימון טיפוסי: 30 עד 60 דקות.</li>
+    <li>בשלב ראשון: איסוף נתונים; בשלב שני: ניתוח מגמות וקשרים.</li>
+    <li>טכנולוגיה מועדפת: Flask פשוט, HTML, CSS, מעט JavaScript לפי צורך.</li>
+    <li>בדיקות: Python unittest בלבד.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>4. בחירת טכנולוגיה</h2>
+  <h3>4.1 החלטה: Flask</h3>
+  <p>
+    הבחירה המומלצת לשלב הראשון היא Flask.
+  </p>
+  <p>
+    הסיבות:
+  </p>
+  <ul>
+    <li>השלד הקיים כבר מתאים ל-Flask.</li>
+    <li>המערכת היא קודם כל מערכת איסוף נתונים אישית, לא API ציבורי מורכב.</li>
+    <li>אפשר לבנות מסכי HTML server-side פשוטים ומהירים.</li>
+    <li>קל לשמור על ארכיטקטורה פשוטה: routes -> services -> model.</li>
+    <li>קל לבדוק עם unittest בלי להכניס stack כבד.</li>
+    <li>קל להעביר משימות קטנות ל-Codex.</li>
+  </ul>
+
+  <h3>4.2 מתי FastAPI כן יהיה עדיף בעתיד</h3>
+  <p>
+    FastAPI יהיה מתאים יותר אם בעתיד המערכת תהפוך ל-API-first, למשל:
+  </p>
+  <ul>
+    <li>אפליקציית Mobile נפרדת.</li>
+    <li>אינטגרציות רבות מול שירותים חיצוניים.</li>
+    <li>שימוש כבד ב-async.</li>
+    <li>צרכני API מרובים.</li>
+    <li>OpenAPI schema כמוצר מרכזי.</li>
+  </ul>
+  <p>
+    לשלב הנוכחי אין סיבה טובה להעדיף FastAPI על Flask.
+  </p>
+</section>
+
+<section>
+  <h2>5. התאמת השלד הקיים</h2>
+  <p>
+    הריפו הקיים מבוסס על תבנית Python ידידותית ל-AI.
+    משימת Codex הראשונה צריכה להיות התאמת השלד לפרויקט, לפני פיתוח פיצ'רים.
+  </p>
+  <h3>5.1 שינויים נדרשים בשלד</h3>
+  <ul>
+    <li>להחליף שם פרויקט מ-template לשם האפליקציה.</li>
+    <li>להחליף package פנימי ל-<code>my_fitness_app</code>.</li>
+    <li>לעדכן README, pyproject, Docker Compose, AGENTS, docs ופקודות הרצה.</li>
+    <li>לשמור על מבנה routes/services/model.</li>
+    <li>להשאיר unittest כמדיניות בדיקות.</li>
+    <li>לא להוסיף תלויות כבדות ללא הצדקה.</li>
+  </ul>
+  <div class="decision">
+    <strong>החלטת שם:</strong>
+    שם הריפו הרשמי הוא <code>sagivba/my_fitness_app</code>.
+    שם ה-package הפנימי המומלץ הוא <code>my_fitness_app</code>, כדי שתהיה התאמה מלאה בין שם הריפו, שם הפרויקט ושם החבילה.
+  </div>
+</section>
+
+<section>
+  <h2>6. שלבי פיתוח מומלצים</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>שלב</th>
+        <th>שם</th>
+        <th>תכולה</th>
+        <th>תוצאה</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>0</td>
+        <td>התאמת השלד</td>
+        <td>שמות, README, package, health check, בדיקות בסיס, Docker, CI.</td>
+        <td>ריפו נקי שמוכן לעבודה.</td>
+      </tr>
+      <tr>
+        <td>1</td>
+        <td>מודל נתונים בסיסי</td>
+        <td>SQLite, טבלאות בסיס, repositories/services, migrations פשוטות או init script.</td>
+        <td>אפשר לשמור נתוני אימונים, ימים, שינה ותזונה.</td>
+      </tr>
+      <tr>
+        <td>2</td>
+        <td>מסכי הזנה ידניים</td>
+        <td>טפסים לאימון, שינה, ארוחה, תחושה יומית, הערות.</td>
+        <td>אפשר להתחיל לאסוף נתונים מיד.</td>
+      </tr>
+      <tr>
+        <td>3</td>
+        <td>ייבוא Garmin ראשוני</td>
+        <td>ייבוא קבצי CSV/FIT/TCX/GPX לפי החלטה, שמירת raw file ונרמול נתוני activity.</td>
+        <td>אפשר לקלוט נתוני שעון.</td>
+      </tr>
+      <tr>
+        <td>4</td>
+        <td>דשבורדים ראשונים</td>
+        <td>סיכום שבועי, עומס אימונים, משך אימונים, שינה, דופק, תזונה בסיסית.</td>
+        <td>תצוגת מצב אישית.</td>
+      </tr>
+      <tr>
+        <td>5</td>
+        <td>צילום ארוחה ו-OpenAI API</td>
+        <td>העלאת תמונה, תיאור ידני, קריאה ל-OpenAI API, הערכת רכיבי מזון ומקרו.</td>
+        <td>יומן תזונה חכם אך ניתן לתיקון ידני.</td>
+      </tr>
+      <tr>
+        <td>6</td>
+        <td>ניתוח קשרים</td>
+        <td>קורלציות בין אימון, אוכל, שינה, התאוששות ומדדים ידניים.</td>
+        <td>תובנות אישיות מבוססות נתונים.</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <h2>7. מקורות נתונים</h2>
+  <h3>7.1 Garmin</h3>
+  <p>
+    בשלב הראשון המערכת תתמוך בייבוא ידני מקבצים, ולא באינטגרציה רשמית ישירה.
+    הסיבה: ייבוא קבצים מהיר יותר לפיתוח, פשוט יותר לבדיקה, ואינו דורש אישורי API.
+  </p>
+  <p>פורמטים רצויים:</p>
+  <ul>
+    <li><strong>FIT:</strong> הפורמט העשיר והמועדף לפעילות בודדת, כולל נתונים מפורטים.</li>
+    <li><strong>TCX:</strong> פורמט XML שימושי לנתוני activity, דופק, מסלול ומשך.</li>
+    <li><strong>GPX:</strong> טוב בעיקר למסלול ומיקום, פחות עשיר למדדי כושר.</li>
+    <li><strong>CSV:</strong> טוב לייבוא טבלאי וסיכומי split, פחות מתאים לנתונים מפורטים מלאים.</li>
+  </ul>
+  <p>
+    המלצה מעשית: להתחיל מייבוא CSV ידני או טופס ידני לצורך MVP,
+    ואז להוסיף FIT כייבוא העיקרי לנתוני Garmin עשירים.
+  </p>
+
+  <h3>7.2 תזונה</h3>
+  <ul>
+    <li>הזנה ידנית של ארוחה.</li>
+    <li>צילום צלחת.</li>
+    <li>תיאור מילולי של הארוחה.</li>
+    <li>קישור למתכון באתר המתכונים האישי, אם רלוונטי.</li>
+    <li>הערכת קלוריות, חלבון, פחמימות, שומן וסיבים באמצעות OpenAI API.</li>
+    <li>שמירת רמת ודאות והערות משתמש.</li>
+    <li>אפשרות לתקן ידנית את ההערכה.</li>
+  </ul>
+
+  <h3>7.3 שינה</h3>
+  <ul>
+    <li>משך שינה.</li>
+    <li>שעת שינה ושעת יקיצה.</li>
+    <li>איכות שינה ידנית.</li>
+    <li>הערות: קימה בלילה, עייפות, אלכוהול, קפה, ארוחה מאוחרת, אימון מאוחר.</li>
+    <li>ייבוא עתידי מ-Garmin אם הנתונים זמינים.</li>
+  </ul>
+
+  <h3>7.4 מדדים רפואיים - מודול עתידי</h3>
+  <div class="future">
+    <p>
+      מדדים רפואיים יישמרו בשלב ראשון כמודול עתידי, עם הכנה תכנונית בלבד.
+      לא נדרש לפתח אותו ב-MVP הראשון.
+    </p>
+  </div>
+  <ul>
+    <li>לחץ דם.</li>
+    <li>סוכר.</li>
+    <li>משקל.</li>
+    <li>היקפים.</li>
+    <li>תרופות או הערות טיפוליות, אם המשתמש יבחר להזין אותן.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>8. סוגי אימונים</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>סוג אימון</th>
+        <th>מדדים עיקריים</th>
+        <th>הערות</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>אימון כוח בחוץ</td>
+        <td>משך, דופק ממוצע, דופק מקסימלי, RPE, תרגילים, סטים, חזרות, הערות.</td>
+        <td>ייתכן שאין משקל חיצוני; חשוב לתעד תחושה ועומס.</td>
+      </tr>
+      <tr>
+        <td>מכון כושר משולב</td>
+        <td>חלוקה לאירובי וכוח, משך כל חלק, מכשירים, דופק, עומס, תרגילים.</td>
+        <td>אימון טיפוסי 30-60 דקות.</td>
+      </tr>
+      <tr>
+        <td>אליפטיקל</td>
+        <td>משך, דופק, קלוריות, רמת התנגדות, cadence אם קיים, RPE.</td>
+        <td>מדד טוב לאירובי ללא עומס ריצה.</td>
+      </tr>
+      <tr>
+        <td>הליכה</td>
+        <td>משך, מרחק, קצב, צעדים, דופק, עליות, מסלול.</td>
+        <td>חשוב להבחין בין הליכה רגילה להליכה כאימון.</td>
+      </tr>
+      <tr>
+        <td>אופניים</td>
+        <td>משך, מרחק, מהירות, דופק, עליות, cadence אם קיים.</td>
+        <td>רלוונטי גם לאופניים נייחים וגם בחוץ.</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <h2>9. מדדים לשמירה</h2>
+
+  <h3>9.1 מדדי פעילות ואימון</h3>
+  <ul>
+    <li>תאריך ושעה.</li>
+    <li>סוג אימון.</li>
+    <li>משך.</li>
+    <li>מרחק.</li>
+    <li>צעדים.</li>
+    <li>קלוריות.</li>
+    <li>דופק ממוצע.</li>
+    <li>דופק מקסימלי.</li>
+    <li>דקות באזורי דופק.</li>
+    <li>קצב ממוצע.</li>
+    <li>מהירות ממוצעת.</li>
+    <li>גובה מצטבר.</li>
+    <li>עצימות סובייקטיבית RPE, למשל 1 עד 10.</li>
+    <li>תחושת התאוששות לפני האימון.</li>
+    <li>תחושת עייפות אחרי האימון.</li>
+    <li>הערות חופשיות.</li>
+  </ul>
+
+  <h3>9.2 מדדי כוח</h3>
+  <ul>
+    <li>שם תרגיל.</li>
+    <li>קבוצת שרירים.</li>
+    <li>מספר סטים.</li>
+    <li>מספר חזרות.</li>
+    <li>משקל.</li>
+    <li>משך מנוחה.</li>
+    <li>RPE לסט או לתרגיל.</li>
+    <li>האם נרשם כאב או אי נוחות.</li>
+  </ul>
+
+  <h3>9.3 מדדי שינה</h3>
+  <ul>
+    <li>שעת שינה.</li>
+    <li>שעת יקיצה.</li>
+    <li>משך שינה.</li>
+    <li>איכות שינה ידנית.</li>
+    <li>עייפות בבוקר.</li>
+    <li>הערות.</li>
+  </ul>
+
+  <h3>9.4 מדדי תזונה</h3>
+  <ul>
+    <li>שעת ארוחה.</li>
+    <li>סוג ארוחה: בוקר, צהריים, ערב, ביניים, אחרי אימון.</li>
+    <li>תיאור חופשי.</li>
+    <li>תמונה.</li>
+    <li>קישור למתכון.</li>
+    <li>קלוריות משוערות.</li>
+    <li>חלבון.</li>
+    <li>פחמימות.</li>
+    <li>שומן.</li>
+    <li>סיבים.</li>
+    <li>רמת ודאות.</li>
+    <li>האם המשתמש תיקן את הערכת ה-AI.</li>
+  </ul>
+
+  <h3>9.5 מדדים יומיים</h3>
+  <ul>
+    <li>מצב אנרגיה.</li>
+    <li>מצב רוח.</li>
+    <li>סטרס ידני.</li>
+    <li>כאבים או מגבלות.</li>
+    <li>הערות כלליות.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>10. מסכי המערכת</h2>
+
+  <h3>10.1 דף בית / Dashboard</h3>
+  <ul>
+    <li>סיכום היום.</li>
+    <li>אימון אחרון.</li>
+    <li>שינה אחרונה.</li>
+    <li>ארוחות היום.</li>
+    <li>מדדים חסרים להיום.</li>
+    <li>קישורים מהירים: הוסף אימון, הוסף ארוחה, הוסף שינה, ייבא Garmin.</li>
+  </ul>
+
+  <h3>10.2 יומן אימונים</h3>
+  <ul>
+    <li>רשימת אימונים.</li>
+    <li>סינון לפי סוג אימון.</li>
+    <li>סינון לפי תאריכים.</li>
+    <li>צפייה בפרטי אימון.</li>
+    <li>הוספה ועריכה ידנית.</li>
+    <li>סימון מקור: ידני, Garmin CSV, Garmin FIT, Garmin TCX, Garmin GPX.</li>
+  </ul>
+
+  <h3>10.3 טופס אימון</h3>
+  <ul>
+    <li>סוג אימון.</li>
+    <li>תאריך ושעה.</li>
+    <li>משך.</li>
+    <li>מדדי דופק.</li>
+    <li>מדדי מרחק/מהירות/צעדים לפי סוג אימון.</li>
+    <li>תרגילי כוח, אם רלוונטי.</li>
+    <li>RPE.</li>
+    <li>הערות.</li>
+  </ul>
+
+  <h3>10.4 ייבוא Garmin</h3>
+  <ul>
+    <li>העלאת קובץ.</li>
+    <li>זיהוי פורמט.</li>
+    <li>שמירת הקובץ המקורי.</li>
+    <li>תצוגת preview לפני שמירה.</li>
+    <li>זיהוי כפילויות לפי תאריך, שעה, סוג ומשך.</li>
+    <li>שמירת נתונים מנורמלים.</li>
+  </ul>
+
+  <h3>10.5 יומן תזונה</h3>
+  <ul>
+    <li>רשימת ארוחות.</li>
+    <li>הוספת ארוחה ידנית.</li>
+    <li>העלאת תמונת צלחת.</li>
+    <li>תיאור מילולי.</li>
+    <li>קישור למתכון אישי.</li>
+    <li>קריאה ל-OpenAI API לצורך הערכת מזון.</li>
+    <li>עריכה ידנית של תוצאת ה-AI.</li>
+  </ul>
+
+  <h3>10.6 יומן שינה</h3>
+  <ul>
+    <li>הזנת שעת שינה ושעת יקיצה.</li>
+    <li>משך מחושב אוטומטית.</li>
+    <li>איכות שינה ידנית.</li>
+    <li>הערות.</li>
+  </ul>
+
+  <h3>10.7 מסך מגמות בסיסי</h3>
+  <ul>
+    <li>מספר אימונים בשבוע.</li>
+    <li>משך אימונים שבועי.</li>
+    <li>חלוקה לפי סוג אימון.</li>
+    <li>משך שינה ממוצע.</li>
+    <li>קלוריות/חלבון משוערים אם קיימים.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>11. מודל נתונים ראשוני</h2>
+  <p>
+    המודל צריך להיות פשוט אך ניתן להרחבה.
+    מומלץ להתחיל ב-SQLite ולשמור אפשרות מעבר ל-PostgreSQL בעתיד.
+  </p>
+
+  <h3>11.1 טבלאות מוצעות</h3>
+  <pre><code>daily_log
+- id
+- log_date
+- energy_level
+- mood_level
+- stress_level
+- notes
+- created_at
+- updated_at
+
+workout
+- id
+- workout_date
+- start_time
+- end_time
+- workout_type
+- source
+- source_file_id
+- duration_minutes
+- distance_km
+- steps
+- calories
+- avg_heart_rate
+- max_heart_rate
+- avg_pace
+- avg_speed
+- elevation_gain_m
+- rpe
+- recovery_feeling
+- fatigue_after
+- notes
+- created_at
+- updated_at
+
+strength_exercise
+- id
+- workout_id
+- exercise_name
+- muscle_group
+- set_count
+- reps
+- weight_kg
+- rest_seconds
+- rpe
+- pain_or_discomfort
+- notes
+
+sleep_log
+- id
+- sleep_date
+- bedtime
+- wake_time
+- duration_minutes
+- sleep_quality
+- morning_fatigue
+- source
+- notes
+- created_at
+- updated_at
+
+meal
+- id
+- meal_date
+- meal_time
+- meal_type
+- description
+- recipe_url
+- image_path
+- estimated_calories
+- estimated_protein_g
+- estimated_carbs_g
+- estimated_fat_g
+- estimated_fiber_g
+- ai_confidence
+- ai_raw_response_json
+- user_corrected
+- notes
+- created_at
+- updated_at
+
+imported_file
+- id
+- source
+- original_filename
+- stored_path
+- file_type
+- sha256
+- imported_at
+- status
+- error_message
+
+medical_metric
+- id
+- metric_date
+- metric_type
+- value_1
+- value_2
+- unit
+- source
+- notes
+- created_at
+- updated_at</code></pre>
+
+  <h3>11.2 כללי מודל</h3>
+  <ul>
+    <li>כל קובץ מיובא נשמר כ-raw file.</li>
+    <li>כל נתון מנורמל שומר reference לקובץ המקור אם קיים.</li>
+    <li>אין למחוק raw data בזמן עיבוד.</li>
+    <li>ייבוא צריך להיות idempotent ככל האפשר.</li>
+    <li>יש לזהות כפילויות לפני יצירת workout חדש.</li>
+    <li>AI food estimation נשמר כהצעה בלבד, לא כאמת מוחלטת.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>12. OpenAI API לתזונה</h2>
+  <p>
+    המערכת תאפשר העלאת תמונת ארוחה וצירוף תיאור מילולי.
+    השירות ישלח את התמונה והתיאור ל-OpenAI API ויקבל תשובה מובנית.
+  </p>
+
+  <h3>12.1 קלט</h3>
+  <ul>
+    <li>תמונה.</li>
+    <li>תיאור חופשי של המשתמש.</li>
+    <li>שעת ארוחה.</li>
+    <li>סוג ארוחה.</li>
+    <li>קישור אופציונלי למתכון.</li>
+  </ul>
+
+  <h3>12.2 פלט רצוי מה-AI</h3>
+  <pre><code>{
+  "identified_items": [
+    {
+      "name": "string",
+      "estimated_quantity": "string",
+      "confidence": 0.0
+    }
+  ],
+  "estimated_calories": 0,
+  "estimated_protein_g": 0,
+  "estimated_carbs_g": 0,
+  "estimated_fat_g": 0,
+  "estimated_fiber_g": 0,
+  "confidence": 0.0,
+  "assumptions": ["string"],
+  "warnings": ["string"]
+}</code></pre>
+
+  <h3>12.3 כללי בטיחות ודיוק</h3>
+  <ul>
+    <li>המערכת תציג שהערכות תזונה הן אומדן בלבד.</li>
+    <li>המשתמש חייב להיות מסוגל לתקן כל ערך.</li>
+    <li>יש לשמור גם את תשובת ה-AI המקורית לצורך audit.</li>
+    <li>אין להציג המלצות רפואיות אוטומטיות.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>13. ניתוח קשרים - שלב עתידי</h2>
+  <p>
+    לאחר שיצטברו נתונים, ניתן להוסיף שכבת ניתוח.
+  </p>
+  <ul>
+    <li>קשר בין סוג אימון לבין איכות שינה באותו לילה.</li>
+    <li>קשר בין שעת אימון לבין שינה.</li>
+    <li>קשר בין ארוחה מאוחרת לבין איכות שינה.</li>
+    <li>קשר בין עומס אימונים שבועי לבין עייפות.</li>
+    <li>קשר בין משך שינה לבין ביצועי אימון ביום שאחרי.</li>
+    <li>קשר בין תזונה לבין תחושת אנרגיה.</li>
+  </ul>
+  <p>
+    בשלב הראשון יש רק להכין את מודל הנתונים כך שהניתוחים האלה יהיו אפשריים בעתיד.
+  </p>
+</section>
+
+<section>
+  <h2>14. ארכיטקטורת קוד</h2>
+  <pre><code>src/my_fitness_app/
+├── __init__.py
+├── app.py
+├── config.py
+├── routes/
+│   ├── __init__.py
+│   ├── health_routes.py
+│   ├── dashboard_routes.py
+│   ├── workout_routes.py
+│   ├── sleep_routes.py
+│   ├── meal_routes.py
+│   └── import_routes.py
+├── services/
+│   ├── __init__.py
+│   ├── workout_service.py
+│   ├── sleep_service.py
+│   ├── meal_service.py
+│   ├── garmin_import_service.py
+│   ├── food_ai_service.py
+│   └── dashboard_service.py
+├── model/
+│   ├── __init__.py
+│   ├── database.py
+│   ├── daily_log.py
+│   ├── workout.py
+│   ├── sleep_log.py
+│   ├── meal.py
+│   └── imported_file.py
+└── utils/
+    ├── __init__.py
+    ├── dates.py
+    ├── files.py
+    └── hashing.py</code></pre>
+
+  <h3>14.1 גבולות אחריות</h3>
+  <ul>
+    <li>routes: קבלת request, בדיקת קלט בסיסית, החזרת response או render_template.</li>
+    <li>services: לוגיקה עסקית, נרמול נתונים, בדיקות כפילות, orchestration.</li>
+    <li>model: מודלים, גישה ל-DB, מבני נתונים.</li>
+    <li>utils: פונקציות כלליות קטנות בלבד.</li>
+  </ul>
+  <div class="note">
+    אין לשים לוגיקה עסקית בתוך route handlers.
+  </div>
+</section>
+
+<section>
+  <h2>15. בדיקות</h2>
+  <p>
+    יש להשתמש ב-unittest בלבד.
+  </p>
+  <h3>15.1 בדיקות חובה</h3>
+  <ul>
+    <li>בדיקת health endpoint.</li>
+    <li>בדיקות יצירת workout.</li>
+    <li>בדיקות validation לקלטים.</li>
+    <li>בדיקות חישוב duration.</li>
+    <li>בדיקות שמירת meal.</li>
+    <li>בדיקות parsing בסיסי לקובץ ייבוא לדוגמה.</li>
+    <li>בדיקות duplicate detection.</li>
+    <li>בדיקות dashboard summary.</li>
+  </ul>
+
+  <h3>15.2 פקודת בדיקה</h3>
+  <pre><code>scripts/test.sh full local</code></pre>
+
+  <h3>15.3 מדיניות בדיקות</h3>
+  <ul>
+    <li>כל שינוי משמעותי חייב לכלול בדיקה.</li>
+    <li>בדיקות לא יפנו ל-OpenAI API בפועל.</li>
+    <li>בדיקות AI ישתמשו ב-fake client או mock פשוט.</li>
+    <li>בדיקות import ישתמשו בקבצי fixtures קטנים.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>16. קונפיגורציה וסודות</h2>
+  <p>
+    אין לשמור מפתחות API בקוד או ב-Git.
+  </p>
+  <pre><code>.env
+OPENAI_API_KEY=...
+APP_ENV=development
+DATABASE_URL=sqlite:///instance/my_fitness_app.db
+UPLOAD_FOLDER=instance/uploads</code></pre>
+  <p>
+    קובץ <code>.env.example</code> יכלול שמות משתנים ללא ערכים אמיתיים.
+  </p>
+</section>
+
+<section>
+  <h2>17. UX ועקרונות ממשק</h2>
+  <ul>
+    <li>ממשק בעברית, RTL.</li>
+    <li>טפסים פשוטים ומהירים להזנה.</li>
+    <li>העדפת defaults חכמים.</li>
+    <li>אפשרות להוסיף אימון בפחות מדקה.</li>
+    <li>אפשרות להוסיף ארוחה עם תמונה ותיאור קצר.</li>
+    <li>הצגת שדות מתקדמים רק כשצריך.</li>
+    <li>הבדלה ברורה בין נתון ידני, נתון Garmin ונתון AI.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>18. Definition of Done ל-MVP ראשון</h2>
+  <ul>
+    <li>הריפו מותאם לשם הפרויקט.</li>
+    <li>האפליקציה רצה מקומית ב-Flask.</li>
+    <li>יש health endpoint.</li>
+    <li>יש DB מקומי.</li>
+    <li>אפשר להוסיף, לערוך ולראות אימונים.</li>
+    <li>אפשר להוסיף שינה.</li>
+    <li>אפשר להוסיף ארוחה ידנית.</li>
+    <li>יש מסך dashboard בסיסי.</li>
+    <li>יש בדיקות unittest.</li>
+    <li>CI עובר.</li>
+    <li>README מסביר איך מריצים, בודקים ומפתחים.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>19. Slash Goal מוצע ל-Codex - שלב 0</h2>
+  <p>
+    זהו יעד ראשון בלבד. אין לבקש מ-Codex לבנות את כל האפליקציה במשימה אחת.
+  </p>
+  <pre><code>/goal
+Prepare the existing repository as the foundation for a personal Flask-based fitness tracking application.
+
+Repository:
+- Existing repo: sagivba/my_fitness_app
+- The repository name is already correct. Do not rename the GitHub repository.
+- Use a task branch named: codex-cli/initialize-fitness-app-foundation
+
+Scope:
+1. Rename the internal Python package from the template name to my_fitness_app.
+2. Update imports, pyproject.toml, README.md, .env.example, Docker Compose project names, VS Code settings, docs, and test references accordingly.
+3. Keep the existing architecture style: routes -> services -> model, with utils for small generic helpers only.
+4. Keep Flask as the web framework.
+5. Keep unittest as the test framework. Do not introduce pytest.
+6. Keep the existing local, docker-dev, and docker-qa test flows working.
+7. Preserve the existing health endpoint behavior and update it to the new package path.
+8. Add a short product-oriented README section describing the app as a personal fitness data collection app for workouts, Garmin imports, meals, sleep, and future analytics.
+9. Do not implement Garmin import, OpenAI API calls, meal photo analysis, or analytics in this task.
+10. Do not add database schema in this task unless required by existing tests.
+
+Validation:
+- Run scripts/test.sh full local
+- Run scripts/lint.sh
+- Report any command failures with exact output and proposed fix.
+
+Constraints:
+- Small, reviewable changes only.
+- No secrets in the repository.
+- Do not add unnecessary dependencies.
+- Business logic must not be placed in route handlers.
+- Keep documentation aligned with actual commands and structure.
+</code></pre>
+</section>
+
+<section>
+  <h2>20. משימות Codex עתידיות</h2>
+  <ol>
+    <li>Stage 1: Add SQLite persistence and domain models.</li>
+    <li>Stage 2: Add workout CRUD screens.</li>
+    <li>Stage 3: Add sleep and daily log screens.</li>
+    <li>Stage 4: Add meal logging without AI.</li>
+    <li>Stage 5: Add Garmin import skeleton and raw file storage.</li>
+    <li>Stage 6: Add FIT/TCX parsing support.</li>
+    <li>Stage 7: Add meal photo upload and OpenAI API integration with fake client tests.</li>
+    <li>Stage 8: Add basic dashboard metrics.</li>
+    <li>Stage 9: Add trend and correlation analysis.</li>
+  </ol>
+</section>
+
+</main>
+</body>
+</html>
