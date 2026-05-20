@@ -11,10 +11,12 @@ class TestApp(unittest.TestCase):
         self.temp_dir = TemporaryDirectory()
         self.addCleanup(self.temp_dir.cleanup)
         self.database_path = Path(self.temp_dir.name) / "test.db"
+        self.upload_directory = Path(self.temp_dir.name) / "uploads"
         self.app = create_app(
             AppConfig(
                 project_name="Test Project",
                 database_path=self.database_path,
+                upload_directory=self.upload_directory,
             )
         )
         self.client = self.app.test_client()
@@ -33,6 +35,9 @@ class TestApp(unittest.TestCase):
 
     def test_database_path_config(self):
         self.assertEqual(self.app.config["DATABASE_PATH"], str(self.database_path))
+
+    def test_upload_directory_config(self):
+        self.assertEqual(self.app.config["UPLOAD_DIRECTORY"], str(self.upload_directory))
 
 
 if __name__ == "__main__":

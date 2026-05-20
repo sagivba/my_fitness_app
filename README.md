@@ -7,11 +7,11 @@ The application is intended to collect and organize personal fitness, sleep, nut
 ## Current status
 
 This repository currently contains the initialized Flask foundation for the app and a
-minimal SQLite persistence foundation with basic workout, sleep, daily log, and manual
-meal data entry.
+minimal SQLite persistence foundation with basic workout, sleep, daily log, manual
+meal data entry, and raw activity file storage.
 
-The next development phase can build manual data collection features on top of the
-database foundation.
+The Garmin import foundation stores raw files only. It does not parse Garmin files,
+create workouts, or create derived metrics.
 
 ## Initial scope
 
@@ -166,6 +166,25 @@ http://127.0.0.1:5000/meals/new
 Manual meal logging uses only the current SQLite `meal` table fields. AI nutrition
 analysis, meal photo upload, `meal_time`, and `recipe_url` are future scope.
 
+Raw import file pages:
+
+```text
+http://127.0.0.1:5000/imports/
+http://127.0.0.1:5000/imports/new
+```
+
+Raw import storage accepts `.csv`, `.tcx`, `.gpx`, and `.fit` files. Uploaded files are
+stored locally under `UPLOAD_DIRECTORY`, defaulting to `instance/uploads`.
+
+Each raw file is stored as `<sha256>.<ext>`. The app records only the existing
+`imported_file` metadata fields: original filename, stored path, SHA-256 hash, file
+type, import time, created time, and updated time. Duplicate uploads are detected by
+SHA-256 hash and do not create another physical file or database row.
+
+This CP06 import foundation stores raw files only. Garmin parsing, workout creation,
+metric creation, duplicate activity matching, and Garmin Connect integration are future
+scope.
+
 ## SQLite persistence
 
 The app reads its database location from `DATABASE_PATH`.
@@ -177,6 +196,14 @@ instance/my_fitness_app.db
 ```
 
 The `instance/` directory is local application data and is not tracked by Git.
+
+The app reads its raw import upload directory from `UPLOAD_DIRECTORY`.
+
+Default:
+
+```text
+instance/uploads
+```
 
 The app initializes the configured SQLite schema during startup. The model layer owns
 database access in:
