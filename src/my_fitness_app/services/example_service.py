@@ -1,4 +1,4 @@
-from my_python_project_template.model.example_model import HealthStatus
+from my_fitness_app.model.example_model import HealthStatus
 
 
 def get_welcome_message(project_name: str) -> str:

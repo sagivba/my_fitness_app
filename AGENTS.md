@@ -1,29 +1,30 @@
-# AGENTS.md
+# AGENTS.md - AI development instructions
 
-Instructions for AI agents, Codex CLI, ChatGPT, and other AI-assisted development workflows.
+This repository contains a personal Flask-based fitness tracking application.
 
-This repository is an AI-friendly Python project template. The main goal is to keep the project simple, readable, reviewable, and predictable for both humans and automated agents.
+The application is local-first and is designed to collect structured data about workouts, Garmin activity imports, sleep, meals, and future analytics.
+
+These instructions apply to Codex CLI, ChatGPT, and any AI-assisted development workflow.
 
 ## Core rules
 
 - Keep changes small and reviewable.
 - Make one logical change at a time.
-- Do not reorganize the repository unless explicitly requested.
+- Do not reorganize the repository unless the task explicitly asks for it.
 - Do not edit unrelated files.
 - Do not perform broad refactors unless explicitly requested.
 - Preserve the existing architecture unless the task explicitly asks to change it.
 - Prefer explicit, direct, maintainable code over clever code.
 - Do not introduce speculative abstractions.
-- Do not add dependencies unless they are necessary and documented.
+- Do not add dependencies unless they are necessary, documented, and covered by tests.
 - Do not change public behavior without adding or updating tests.
 - Update documentation when setup, commands, behavior, architecture, or workflow changes.
 - Run the documented checks before claiming the task is complete.
 
 ## Technology assumptions
 
-This template assumes:
-
 - Python 3.12+
+- Flask
 - WSL-based local development
 - VS Code connected to WSL
 - `unittest` only
@@ -32,23 +33,25 @@ This template assumes:
 - small, focused pull requests
 - Codex CLI friendly branch and worktree workflows
 
-Do not introduce `pytest`, a database, a background worker, a frontend framework, a queue, a cache, or an external service dependency unless explicitly requested.
+Do not introduce `pytest`, a frontend framework, a background worker, a queue, a cache, or a public deployment model unless explicitly requested.
+
+A database is allowed only in tasks that explicitly introduce persistence. The default MVP database is SQLite.
 
 ## Branch naming
 
 For Codex CLI or AI-assisted implementation work, use this branch prefix:
 
 ```text
-codex-cli/<short-task-name>
+codex-cli/
 ```
 
 Examples:
 
 ```text
-codex-cli/add-health-endpoint
-codex-cli/improve-config-loading
-codex-cli/add-service-tests
-codex-cli/fix-docker-test-target
+codex-cli/initialize-fitness-app-foundation
+codex-cli/add-sqlite-persistence
+codex-cli/add-workout-crud
+codex-cli/add-garmin-csv-import
 ```
 
 Use concise, descriptive branch names. Avoid vague names such as:
@@ -63,12 +66,12 @@ codex-cli/update
 
 Keep responsibilities separated:
 
-- `src/<package_name>/app.py`: application factory and wiring.
-- `src/<package_name>/config.py`: configuration loading.
-- `src/<package_name>/routes/`: request/response boundary only.
-- `src/<package_name>/services/`: application and business logic.
-- `src/<package_name>/model/`: domain models, data structures, model-facing code.
-- `src/<package_name>/utils/`: small generic helpers only.
+- `src/my_fitness_app/app.py`: application factory and wiring.
+- `src/my_fitness_app/config.py`: configuration loading.
+- `src/my_fitness_app/routes/`: request/response boundary only.
+- `src/my_fitness_app/services/`: application and business logic.
+- `src/my_fitness_app/model/`: domain models, persistence-facing code, and data structures.
+- `src/my_fitness_app/utils/`: small generic helpers only.
 - `templates/`: HTML templates.
 - `static/`: CSS, images, and static assets.
 - `tests/`: `unittest`-based test coverage.
@@ -81,7 +84,7 @@ Route handlers should:
 
 - parse request inputs
 - call services
-- return responses
+- return responses or render templates
 
 Services should:
 
@@ -91,13 +94,49 @@ Services should:
 
 Models should:
 
-- represent domain data or model-facing structures
+- represent domain data or persistence-facing structures
 - avoid HTTP concerns
 
 Utilities should:
 
 - remain generic
 - not become a dumping ground for business rules
+
+## Product-specific rules
+
+### Garmin imports
+
+- Do not integrate with Garmin Connect APIs unless a task explicitly asks for it.
+- Start with manual file imports.
+- Preserve raw imported files.
+- Store file metadata and hashes.
+- Keep imports as idempotent as practical.
+- Detect likely duplicate activities before creating duplicate workouts.
+- Prefer CSV, TCX, and GPX support before adding FIT parsing dependencies.
+
+### Meals and AI nutrition estimates
+
+- Manual meal logging comes before AI analysis.
+- AI-generated nutrition values are estimates only.
+- Users must be able to correct AI-generated values.
+- Save raw AI responses for audit when AI analysis exists.
+- Tests must not call the real OpenAI API.
+- Use fake clients or mocks for OpenAI-related tests.
+- Never commit API keys or real secrets.
+- Do not present AI nutrition estimates as medical advice.
+
+### Medical metrics
+
+- Medical metrics are future module scope unless a task explicitly asks to implement them.
+- Do not add diagnosis, treatment recommendations, or medical advice.
+- Store user-provided measurements as data only.
+
+### Analytics
+
+- Correlation analytics are future scope.
+- Do not infer causal claims.
+- Use cautious wording such as correlation, association, trend, and possible relationship.
+- Analytics should be based on structured data already stored by previous stages.
 
 ## Testing policy
 
@@ -124,6 +163,8 @@ Add or update tests when changing behavior in:
 - validation
 - configuration
 - model/domain logic
+- persistence
+- import/parsing logic
 - public APIs
 - command scripts
 - Docker/runtime wiring
@@ -277,7 +318,7 @@ Documentation must stay aligned with:
 - CI behavior
 - AI/Codex workflow expectations
 
-If code behavior changes but the README or docs still describe the old behavior, the task is incomplete.
+If code behavior changes but the README or docs still describe old behavior, the task is incomplete.
 
 ## Pull request expectations
 
@@ -285,14 +326,15 @@ Each PR should do one focused thing.
 
 Good examples:
 
-- add a Flask route
-- add a service function
-- add validation
+- initialize the project from the template
+- add SQLite persistence
+- add workout CRUD
+- add a Garmin CSV importer
+- add meal logging
 - add tests
 - improve documentation
 - fix Docker test execution
 - update CI
-- improve VS Code settings
 
 Avoid mixing unrelated changes in one PR.
 
@@ -334,32 +376,6 @@ When using Codex, ChatGPT, or another AI coding tool:
 - do not silently change the testing framework
 - do not silently change runtime assumptions
 - run the documented checks before claiming completion
-
-Good AI task:
-
-```text
-Add a /api/health endpoint that returns {"status": "ok"}.
-Use unittest only.
-Update tests.
-Do not modify unrelated files.
-Run scripts/test.sh full local.
-```
-
-Better AI task when Docker is relevant:
-
-```text
-Fix scripts/test.sh so tests can run locally and inside Docker.
-Support local, docker-dev, and docker-qa targets.
-Update README.md and AGENTS.md.
-Run scripts/test.sh full local and scripts/test.sh full docker-dev.
-Do not introduce pytest.
-```
-
-Bad AI task:
-
-```text
-Improve the project.
-```
 
 ## Review checklist
 

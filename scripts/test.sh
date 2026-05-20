@@ -4,7 +4,7 @@ set -euo pipefail
 MODE="${1:-quick}"
 TARGET="${2:-local}"
 
-PROJECT_NAME="${PROJECT_NAME:-python_template}"
+PROJECT_NAME="${PROJECT_NAME:-my_fitness_app}"
 DEV_COMPOSE_PROJECT="${DEV_COMPOSE_PROJECT:-${PROJECT_NAME}_dev}"
 QA_COMPOSE_PROJECT="${QA_COMPOSE_PROJECT:-${PROJECT_NAME}_qa}"
 
@@ -59,9 +59,9 @@ run_local_tests() {
   verbosity="$(verbose_flag)"
 
   if [[ -n "$verbosity" ]]; then
-    python -m unittest discover -s tests -p "test_*.py" "$verbosity"
+    python3 -m unittest discover -s tests -p "test_*.py" "$verbosity"
   else
-    python -m unittest discover -s tests -p "test_*.py"
+    python3 -m unittest discover -s tests -p "test_*.py"
   fi
 }
 
@@ -82,14 +82,14 @@ run_docker_tests() {
       -f docker-compose.yml \
       -f "$compose_override" \
       run --rm app \
-      python -m unittest discover -s tests -p "test_*.py" "$verbosity"
+      python3 -m unittest discover -s tests -p "test_*.py" "$verbosity"
   else
     docker compose \
       -p "$compose_project" \
       -f docker-compose.yml \
       -f "$compose_override" \
       run --rm app \
-      python -m unittest discover -s tests -p "test_*.py"
+      python3 -m unittest discover -s tests -p "test_*.py"
   fi
 }
 

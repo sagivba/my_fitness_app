@@ -1,4 +1,4 @@
-"""my-python-project-template package."""
+"""my-fitness-app package."""
 
 __all__ = ["create_app"]
 

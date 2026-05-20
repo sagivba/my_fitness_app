@@ -1,7 +1,7 @@
 import unittest
 
-from my_python_project_template.app import create_app
-from my_python_project_template.config import AppConfig
+from my_fitness_app.app import create_app
+from my_fitness_app.config import AppConfig
 
 
 class TestApp(unittest.TestCase):

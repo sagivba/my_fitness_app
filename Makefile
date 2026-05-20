@@ -21,7 +21,7 @@ clean:
 	scripts/clean.sh
 
 run:
-	PYTHONPATH=src flask --app my_python_project_template.app:create_app run --debug
+	PYTHONPATH=src flask --app my_fitness_app.app:create_app run --debug
 
 docker-dev:
 	docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d --build

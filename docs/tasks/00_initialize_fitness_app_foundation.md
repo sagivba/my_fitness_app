@@ -62,7 +62,7 @@ scripts/test.sh full docker-dev
 
 - The app runs with the new package name.
 - Health endpoint still returns `{"status": "ok"}` or the existing documented equivalent.
-- No references to `my_python_project_template` remain except in archived/template documentation if deliberately retained and documented.
+- No references to `my_fitness_app` remain except in archived/template documentation if deliberately retained and documented.
 - `AGENTS.md` is readable, project-specific, and uses `src/my_fitness_app/...` paths.
 - Tests and lint pass.
 
@@ -115,7 +115,7 @@ scripts/test.sh full docker-dev
 Acceptance criteria:
 - The app runs with the new package name.
 - Health endpoint still returns `{"status": "ok"}` or the existing documented equivalent.
-- No references to `my_python_project_template` remain except in archived/template documentation if deliberately retained and documented.
+- No references to `my_fitness_app` remain except in archived/template documentation if deliberately retained and documented.
 - `AGENTS.md` is readable, project-specific, and uses `src/my_fitness_app/...` paths.
 - Tests and lint pass.
 ```

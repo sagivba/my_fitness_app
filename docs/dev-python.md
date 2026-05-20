@@ -54,7 +54,7 @@ python -m unittest discover -s tests -p "test_*.py" -v
 ## Run app locally
 
 ```bash
-PYTHONPATH=src flask --app my_python_project_template.app:create_app run --debug
+PYTHONPATH=src flask --app my_fitness_app.app:create_app run --debug
 ```
 
 ## VS Code

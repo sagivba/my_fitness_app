@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-python -m ruff check src tests
-python -m ruff format --check src tests
+python3 -m ruff check src tests
+python3 -m ruff format --check src tests

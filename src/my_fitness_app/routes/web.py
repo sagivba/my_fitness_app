@@ -1,6 +1,6 @@
 from flask import Blueprint, current_app, render_template
 
-from my_python_project_template.services.example_service import get_welcome_message
+from my_fitness_app.services.example_service import get_welcome_message
 
 web_bp = Blueprint("web", __name__)
 

@@ -1,8 +1,8 @@
 from flask import Flask
 
-from my_python_project_template.config import AppConfig
-from my_python_project_template.routes.api import api_bp
-from my_python_project_template.routes.web import web_bp
+from my_fitness_app.config import AppConfig
+from my_fitness_app.routes.api import api_bp
+from my_fitness_app.routes.web import web_bp
 
 
 def create_app(config: AppConfig | None = None) -> Flask:

@@ -14,4 +14,4 @@ COPY . .
 
 EXPOSE 5000
 
-CMD ["flask", "--app", "my_python_project_template.app:create_app", "run", "--host", "0.0.0.0", "--port", "5000"]
+CMD ["flask", "--app", "my_fitness_app.app:create_app", "run", "--host", "0.0.0.0", "--port", "5000"]
