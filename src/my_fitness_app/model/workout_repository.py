@@ -107,6 +107,66 @@ def find_garmin_csv_workout_duplicate(
     return _workout_from_row(row)
 
 
+def find_garmin_file_workout_duplicate(
+    database_path: str | Path,
+    source: str,
+    workout_date: str,
+    start_time: str,
+    workout_type: str,
+    duration_minutes: int | None,
+    distance_meters: float | None,
+) -> Workout | None:
+    query = """
+        SELECT id, workout_date, workout_type, duration_minutes, source, notes,
+               created_at, updated_at
+        FROM workout
+        WHERE workout_date = ?
+          AND workout_type = ?
+          AND source = ?
+          AND notes LIKE ?
+    """
+    parameters: list[str | int | None] = [
+        workout_date,
+        workout_type,
+        source,
+        f"{_source_note_prefix(source)} start time: {start_time}%",
+    ]
+
+    if duration_minutes is None:
+        query += " AND duration_minutes IS NULL"
+    else:
+        query += " AND duration_minutes = ?"
+        parameters.append(duration_minutes)
+
+    if distance_meters is not None:
+        query += " AND notes LIKE ?"
+        parameters.append(f"%Distance meters: {_format_distance(distance_meters)}%")
+
+    query += " ORDER BY id DESC LIMIT 1"
+
+    connection = connect(database_path)
+    try:
+        row = connection.execute(query, parameters).fetchone()
+    finally:
+        connection.close()
+
+    if row is None:
+        return None
+    return _workout_from_row(row)
+
+
+def _source_note_prefix(source: str) -> str:
+    if source == "garmin_tcx":
+        return "Garmin TCX"
+    if source == "garmin_gpx":
+        return "Garmin GPX"
+    return "Garmin"
+
+
+def _format_distance(distance_meters: float) -> str:
+    return f"{distance_meters:.2f}"
+
+
 def _workout_from_row(row: sqlite3.Row) -> Workout:
     return Workout(
         id=row["id"],

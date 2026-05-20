@@ -100,6 +100,52 @@ class TestImportRoutes(TestCase):
         self.assertIn(b"imported", response.data)
         self.assertEqual(len(workouts), 2)
 
+    def test_post_garmin_tcx_import_runs_import_and_renders_summary(self):
+        fixture_content = (FIXTURE_DIR / "garmin_valid.tcx").read_bytes()
+        upload_response = self.client.post(
+            "/imports/",
+            data={"file": (BytesIO(fixture_content), "garmin_valid.tcx")},
+            content_type="multipart/form-data",
+        )
+        imported_file = list_imported_files(self.database_path)[0]
+
+        detail_response = self.client.get(upload_response.headers["Location"])
+        response = self.client.post(f"/imports/{imported_file.id}/garmin-tcx-import")
+
+        workouts = list_workouts(self.database_path)
+        self.assertEqual(upload_response.status_code, 302)
+        self.assertEqual(detail_response.status_code, 200)
+        self.assertIn("ייבוא Garmin TCX".encode(), detail_response.data)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("סיכום ייבוא".encode(), response.data)
+        self.assertIn("אימונים שנוצרו".encode(), response.data)
+        self.assertIn(b"imported", response.data)
+        self.assertEqual(len(workouts), 1)
+        self.assertEqual(workouts[0].source, "garmin_tcx")
+
+    def test_post_garmin_gpx_import_runs_import_and_renders_summary(self):
+        fixture_content = (FIXTURE_DIR / "garmin_valid.gpx").read_bytes()
+        upload_response = self.client.post(
+            "/imports/",
+            data={"file": (BytesIO(fixture_content), "garmin_valid.gpx")},
+            content_type="multipart/form-data",
+        )
+        imported_file = list_imported_files(self.database_path)[0]
+
+        detail_response = self.client.get(upload_response.headers["Location"])
+        response = self.client.post(f"/imports/{imported_file.id}/garmin-gpx-import")
+
+        workouts = list_workouts(self.database_path)
+        self.assertEqual(upload_response.status_code, 302)
+        self.assertEqual(detail_response.status_code, 200)
+        self.assertIn("ייבוא Garmin GPX".encode(), detail_response.data)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("סיכום ייבוא".encode(), response.data)
+        self.assertIn("אימונים שנוצרו".encode(), response.data)
+        self.assertIn(b"imported", response.data)
+        self.assertEqual(len(workouts), 1)
+        self.assertEqual(workouts[0].source, "garmin_gpx")
+
     def test_post_garmin_csv_import_reports_malformed_rows(self):
         fixture_content = (FIXTURE_DIR / "garmin_malformed.csv").read_bytes()
         self.client.post(
@@ -119,6 +165,16 @@ class TestImportRoutes(TestCase):
 
     def test_post_garmin_csv_import_missing_file_returns_404(self):
         response = self.client.post("/imports/999/garmin-csv-import")
+
+        self.assertEqual(response.status_code, 404)
+
+    def test_post_garmin_tcx_import_missing_file_returns_404(self):
+        response = self.client.post("/imports/999/garmin-tcx-import")
+
+        self.assertEqual(response.status_code, 404)
+
+    def test_post_garmin_gpx_import_missing_file_returns_404(self):
+        response = self.client.post("/imports/999/garmin-gpx-import")
 
         self.assertEqual(response.status_code, 404)
 

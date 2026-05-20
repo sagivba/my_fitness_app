@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" version="1.1" creator="my_fitness_app_test">
+  <trk>
+    <name>Too short</name>
+    <type>Walking</type>
+    <trkseg>
+      <trkpt lat="32.0800" lon="34.7800">
+        <ele>10.0</ele>
+        <time>2026-05-18T07:30:00Z</time>
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

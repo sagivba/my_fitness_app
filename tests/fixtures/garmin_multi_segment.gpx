@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" version="1.1" creator="my_fitness_app_test">
+  <trk>
+    <name>Segmented ride</name>
+    <type>Cycling</type>
+    <trkseg>
+      <trkpt lat="32.0800" lon="34.7800">
+        <ele>20.0</ele>
+        <time>2026-05-20T18:00:00Z</time>
+      </trkpt>
+      <trkpt lat="32.0810" lon="34.7810">
+        <ele>22.0</ele>
+        <time>2026-05-20T18:10:00Z</time>
+      </trkpt>
+    </trkseg>
+    <trkseg>
+      <trkpt lat="32.0820" lon="34.7820">
+        <ele>21.0</ele>
+        <time>2026-05-20T18:20:00Z</time>
+      </trkpt>
+      <trkpt lat="32.0830" lon="34.7830">
+        <ele>25.0</ele>
+        <time>2026-05-20T18:30:00Z</time>
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>
