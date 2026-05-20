@@ -13,6 +13,15 @@ REQUIRED_TABLES = {
     "imported_file",
 }
 
+REQUIRED_COLUMNS = {
+    "meal": {
+        "fiber_grams",
+    },
+    "imported_file": {
+        "updated_at",
+    },
+}
+
 
 class TestDatabase(TestCase):
     def test_connect_creates_parent_directory_and_configures_connection(self):
@@ -49,6 +58,27 @@ class TestDatabase(TestCase):
 
         table_names = {row["name"] for row in rows}
         self.assertTrue(REQUIRED_TABLES.issubset(table_names))
+
+    def test_initialize_database_creates_required_schema_columns(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            database_path = Path(temp_dir) / "fitness.db"
+
+            initialize_database(database_path)
+
+            connection = connect(database_path)
+            try:
+                table_columns = {
+                    table_name: {
+                        row["name"]
+                        for row in connection.execute(f"PRAGMA table_info({table_name})")
+                    }
+                    for table_name in REQUIRED_COLUMNS
+                }
+            finally:
+                connection.close()
+
+        for table_name, required_columns in REQUIRED_COLUMNS.items():
+            self.assertTrue(required_columns.issubset(table_columns[table_name]))
 
     def test_initialize_database_is_repeatable(self):
         with tempfile.TemporaryDirectory() as temp_dir:
