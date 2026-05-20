@@ -14,6 +14,43 @@
       <p>הקובץ כבר נשמר בעבר. לא נוצר עותק נוסף.</p>
     {% endif %}
 
+    {% if imported_file.file_type == "csv" %}
+      <form method="post" action="/imports/{{ imported_file.id }}/garmin-csv-import">
+        <button type="submit">ייבוא Garmin CSV</button>
+      </form>
+    {% endif %}
+
+    {% if import_result %}
+      <section>
+        <h2>סיכום ייבוא</h2>
+        <dl>
+          <dt>שורות שנקראו</dt>
+          <dd>{{ import_result.rows_read }}</dd>
+
+          <dt>אימונים שנוצרו</dt>
+          <dd>{{ import_result.workouts_created }}</dd>
+
+          <dt>כפילויות שדולגו</dt>
+          <dd>{{ import_result.duplicate_rows_skipped }}</dd>
+
+          <dt>שורות שגויות</dt>
+          <dd>{{ import_result.malformed_rows }}</dd>
+
+          <dt>סטטוס סופי</dt>
+          <dd>{{ import_result.import_status }}</dd>
+        </dl>
+
+        {% if import_result.errors %}
+          <h3>שגיאות</h3>
+          <ul>
+            {% for error in import_result.errors %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      </section>
+    {% endif %}
+
     <dl>
       <dt>שם קובץ מקורי</dt>
       <dd>{{ imported_file.original_filename }}</dd>
@@ -29,6 +66,14 @@
 
       <dt>זמן ייבוא</dt>
       <dd>{{ imported_file.imported_at }}</dd>
+
+      <dt>סטטוס ייבוא</dt>
+      <dd>{{ imported_file.import_status }}</dd>
+
+      {% if imported_file.import_error_message %}
+        <dt>שגיאת ייבוא</dt>
+        <dd>{{ imported_file.import_error_message }}</dd>
+      {% endif %}
 
       <dt>נוצר בתאריך</dt>
       <dd>{{ imported_file.created_at }}</dd>

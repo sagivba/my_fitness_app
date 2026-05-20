@@ -45,7 +45,7 @@ Current web route groups:
 - `meals.py` handles meal list, create form, create submit, detail, edit form, and
   update submit pages.
 - `imports.py` handles raw import file list, upload form, upload submit, and detail
-  pages.
+  pages, plus the action that triggers Garmin CSV import for uploaded CSV files.
 
 ## src/my_fitness_app/services
 
@@ -59,6 +59,8 @@ Daily log validation and application logic live in `services/daily_log_service.p
 Meal validation and application logic live in `services/meal_service.py`.
 Raw import file validation, hashing, duplicate detection, and local storage logic live
 in `services/import_file_service.py`.
+Garmin CSV parsing, row validation, duplicate workout detection, workout creation, and
+import status updates live in `services/garmin_csv_import_service.py`.
 
 ## src/my_fitness_app/model
 
@@ -82,9 +84,14 @@ image upload, `meal_time`, and `recipe_url` are future scope.
 
 Raw import file storage currently uses only existing `imported_file` table fields:
 `original_filename`, `stored_path`, `file_hash`, `file_type`, `imported_at`,
-`created_at`, and `updated_at`. CP06 stores raw files only under the configured upload
-directory. Garmin parsing, workout creation, metric creation, Garmin Connect
-integration, and analytics remain future scope.
+`created_at`, and `updated_at`. CP07 adds minimal import tracking fields to
+`imported_file`: `import_status` and `import_error_message`.
+
+Garmin CSV import creates normalized workout records from supported CSV rows using the
+existing workout table. The importer sets workout `source` to `garmin_csv` and stores
+CSV start time in workout notes for duplicate detection without changing the workout
+schema. FIT, TCX, GPX, Garmin Connect integration, dashboard metrics, analytics, and
+strength training details remain future scope.
 
 ## src/my_fitness_app/utils
 

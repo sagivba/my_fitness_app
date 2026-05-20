@@ -8,6 +8,8 @@ class ImportedFile:
     stored_path: str
     file_hash: str
     file_type: str
+    import_status: str
+    import_error_message: str | None
     imported_at: str
     created_at: str
     updated_at: str

@@ -20,5 +20,19 @@ def initialize_database(database_path: str | Path) -> None:
     connection = connect(database_path)
     try:
         connection.executescript(schema)
+        _ensure_imported_file_status_columns(connection)
+        connection.commit()
     finally:
         connection.close()
+
+
+def _ensure_imported_file_status_columns(connection: sqlite3.Connection) -> None:
+    columns = {row["name"] for row in connection.execute("PRAGMA table_info(imported_file)")}
+
+    if "import_status" not in columns:
+        connection.execute(
+            "ALTER TABLE imported_file "
+            "ADD COLUMN import_status TEXT NOT NULL DEFAULT 'not_imported'"
+        )
+    if "import_error_message" not in columns:
+        connection.execute("ALTER TABLE imported_file ADD COLUMN import_error_message TEXT")
