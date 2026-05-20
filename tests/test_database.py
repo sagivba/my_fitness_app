@@ -14,6 +14,18 @@ REQUIRED_TABLES = {
 }
 
 REQUIRED_COLUMNS = {
+    "workout": {
+        "average_heart_rate",
+        "calories",
+        "distance_meters",
+        "duration_seconds",
+        "elevation_gain_meters",
+        "elevation_loss_meters",
+        "end_time",
+        "external_activity_id",
+        "max_heart_rate",
+        "start_time",
+    },
     "meal": {
         "fiber_grams",
     },
@@ -132,3 +144,49 @@ class TestDatabase(TestCase):
 
         self.assertIn("import_status", columns)
         self.assertIn("import_error_message", columns)
+
+    def test_initialize_database_adds_metric_columns_to_existing_workout_table(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            database_path = Path(temp_dir) / "fitness.db"
+            connection = connect(database_path)
+            try:
+                connection.execute(
+                    """
+                    CREATE TABLE workout (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        workout_date TEXT NOT NULL,
+                        workout_type TEXT NOT NULL,
+                        duration_minutes INTEGER,
+                        source TEXT NOT NULL DEFAULT 'manual',
+                        notes TEXT,
+                        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+                    )
+                    """
+                )
+                connection.execute(
+                    """
+                    INSERT INTO workout (workout_date, workout_type, duration_minutes, notes)
+                    VALUES ('2026-05-20', 'Walking', 45, 'existing row')
+                    """
+                )
+                connection.commit()
+            finally:
+                connection.close()
+
+            initialize_database(database_path)
+
+            connection = connect(database_path)
+            try:
+                columns = {row["name"] for row in connection.execute("PRAGMA table_info(workout)")}
+                row = connection.execute(
+                    "SELECT workout_type, notes, start_time, distance_meters FROM workout"
+                ).fetchone()
+            finally:
+                connection.close()
+
+        self.assertTrue(REQUIRED_COLUMNS["workout"].issubset(columns))
+        self.assertEqual(row["workout_type"], "Walking")
+        self.assertEqual(row["notes"], "existing row")
+        self.assertIsNone(row["start_time"])
+        self.assertIsNone(row["distance_meters"])

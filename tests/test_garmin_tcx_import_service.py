@@ -48,6 +48,13 @@ class TestGarminTcxImportService(TestCase):
         self.assertEqual(workouts[0].workout_type, "Running")
         self.assertEqual(workouts[0].duration_minutes, 30)
         self.assertEqual(workouts[0].source, "garmin_tcx")
+        self.assertEqual(workouts[0].start_time, "2026-05-18T07:30:00Z")
+        self.assertEqual(workouts[0].duration_seconds, 1800.0)
+        self.assertEqual(workouts[0].distance_meters, 5000.0)
+        self.assertEqual(workouts[0].calories, 320)
+        self.assertEqual(workouts[0].average_heart_rate, 142)
+        self.assertEqual(workouts[0].max_heart_rate, 168)
+        self.assertEqual(workouts[0].external_activity_id, "2026-05-18T07:30:00Z")
         self.assertIn("Garmin TCX start time: 07:30", workouts[0].notes)
         self.assertIn("Distance meters: 5000.00", workouts[0].notes)
         self.assertIn("Calories: 320", workouts[0].notes)
@@ -64,6 +71,8 @@ class TestGarminTcxImportService(TestCase):
         self.assertEqual(result.import_status, IMPORT_STATUS_IMPORTED)
         self.assertEqual(len(workouts), 1)
         self.assertEqual(workouts[0].workout_type, "Walking")
+        self.assertIsNone(workouts[0].average_heart_rate)
+        self.assertIsNone(workouts[0].max_heart_rate)
         self.assertIn(
             "Missing optional fields: average heart rate, max heart rate",
             workouts[0].notes,

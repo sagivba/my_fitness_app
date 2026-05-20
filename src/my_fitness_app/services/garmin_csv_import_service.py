@@ -25,6 +25,22 @@ CANONICAL_HEADER_ALIASES = {
     "duration minutes": "duration_minutes",
     "duration_minutes": "duration_minutes",
     "duration": "duration_minutes",
+    "end time": "end_time",
+    "end_time": "end_time",
+    "distance meters": "distance_meters",
+    "distance_meters": "distance_meters",
+    "distance (m)": "distance_meters",
+    "calories": "calories",
+    "average heart rate": "average_heart_rate",
+    "average_heart_rate": "average_heart_rate",
+    "avg heart rate": "average_heart_rate",
+    "avg hr": "average_heart_rate",
+    "max heart rate": "max_heart_rate",
+    "max_heart_rate": "max_heart_rate",
+    "max hr": "max_heart_rate",
+    "external activity id": "external_activity_id",
+    "external_activity_id": "external_activity_id",
+    "activity id": "external_activity_id",
     "notes": "notes",
 }
 REQUIRED_CANONICAL_HEADERS = {
@@ -44,8 +60,16 @@ class GarminCsvWorkoutRow:
     row_number: int
     workout_date: str
     start_time: str
+    start_timestamp: str
     workout_type: str
     duration_minutes: int
+    duration_seconds: float
+    end_time: str | None
+    distance_meters: float | None
+    calories: int | None
+    average_heart_rate: int | None
+    max_heart_rate: int | None
+    external_activity_id: str | None
     notes: str | None
 
 
@@ -148,7 +172,7 @@ def import_garmin_csv(
         duplicate = workout_repository.find_garmin_csv_workout_duplicate(
             database_path,
             workout_row.workout_date,
-            workout_row.start_time,
+            workout_row.start_timestamp,
             workout_row.workout_type,
             workout_row.duration_minutes,
         )
@@ -164,6 +188,14 @@ def import_garmin_csv(
                 duration_minutes=workout_row.duration_minutes,
                 notes=_build_workout_notes(workout_row),
                 source="garmin_csv",
+                start_time=workout_row.start_timestamp,
+                end_time=workout_row.end_time,
+                duration_seconds=workout_row.duration_seconds,
+                distance_meters=workout_row.distance_meters,
+                calories=workout_row.calories,
+                average_heart_rate=workout_row.average_heart_rate,
+                max_heart_rate=workout_row.max_heart_rate,
+                external_activity_id=workout_row.external_activity_id,
             ),
         )
         workouts_created += 1
@@ -185,18 +217,45 @@ def _parse_workout_row(
 ) -> GarminCsvWorkoutRow:
     workout_date = _parse_date(_required_value(row, header_mapping, "workout_date"))
     start_time = _parse_start_time(_required_value(row, header_mapping, "start_time"))
+    start_timestamp = _timestamp_from_date_and_time(workout_date, start_time)
     workout_type = _required_value(row, header_mapping, "workout_type")
     duration_minutes = _parse_duration_minutes(
         _required_value(row, header_mapping, "duration_minutes")
     )
+    end_time = _parse_optional_time(row, header_mapping, "end_time", workout_date)
+    distance_meters = _parse_optional_positive_float(
+        _optional_value(row, header_mapping, "distance_meters"),
+        "distance_meters",
+    )
+    calories = _parse_optional_positive_int(
+        _optional_value(row, header_mapping, "calories"),
+        "calories",
+    )
+    average_heart_rate = _parse_optional_positive_int(
+        _optional_value(row, header_mapping, "average_heart_rate"),
+        "average_heart_rate",
+    )
+    max_heart_rate = _parse_optional_positive_int(
+        _optional_value(row, header_mapping, "max_heart_rate"),
+        "max_heart_rate",
+    )
+    external_activity_id = _optional_value(row, header_mapping, "external_activity_id")
     notes = _optional_value(row, header_mapping, "notes")
 
     return GarminCsvWorkoutRow(
         row_number=row_number,
         workout_date=workout_date,
         start_time=start_time,
+        start_timestamp=start_timestamp,
         workout_type=workout_type,
         duration_minutes=duration_minutes,
+        duration_seconds=duration_minutes * 60,
+        end_time=end_time,
+        distance_meters=distance_meters,
+        calories=calories,
+        average_heart_rate=average_heart_rate,
+        max_heart_rate=max_heart_rate,
+        external_activity_id=external_activity_id,
         notes=notes,
     )
 
@@ -290,11 +349,61 @@ def _parse_duration_minutes(value: str) -> int:
     return duration_minutes
 
 
+def _parse_optional_time(
+    row: dict[str, str],
+    header_mapping: dict[str, str],
+    canonical_header: str,
+    workout_date: str,
+) -> str | None:
+    value = _optional_value(row, header_mapping, canonical_header)
+    if value is None:
+        return None
+    return _timestamp_from_date_and_time(workout_date, _parse_start_time(value))
+
+
+def _parse_optional_positive_float(value: str | None, field_name: str) -> float | None:
+    if value is None:
+        return None
+    try:
+        parsed_value = float(value)
+    except ValueError as error:
+        raise GarminCsvImportError(f"{field_name} must be a positive number.") from error
+    if parsed_value <= 0:
+        raise GarminCsvImportError(f"{field_name} must be a positive number.")
+    return parsed_value
+
+
+def _parse_optional_positive_int(value: str | None, field_name: str) -> int | None:
+    if value is None:
+        return None
+    try:
+        parsed_value = int(value)
+    except ValueError as error:
+        raise GarminCsvImportError(f"{field_name} must be a positive integer.") from error
+    if parsed_value <= 0:
+        raise GarminCsvImportError(f"{field_name} must be a positive integer.")
+    return parsed_value
+
+
+def _timestamp_from_date_and_time(workout_date: str, start_time: str) -> str:
+    return f"{workout_date}T{start_time}:00"
+
+
 def _build_workout_notes(workout_row: GarminCsvWorkoutRow) -> str:
     notes = [
         f"Garmin CSV start time: {workout_row.start_time}",
         f"Garmin CSV row: {workout_row.row_number}",
     ]
+    if workout_row.distance_meters is not None:
+        notes.append(f"Distance meters: {workout_row.distance_meters:.2f}")
+    if workout_row.calories is not None:
+        notes.append(f"Calories: {workout_row.calories}")
+    if workout_row.average_heart_rate is not None:
+        notes.append(f"Average heart rate bpm: {workout_row.average_heart_rate}")
+    if workout_row.max_heart_rate is not None:
+        notes.append(f"Max heart rate bpm: {workout_row.max_heart_rate}")
+    if workout_row.external_activity_id is not None:
+        notes.append(f"External activity ID: {workout_row.external_activity_id}")
     if workout_row.notes:
         notes.append(workout_row.notes)
 

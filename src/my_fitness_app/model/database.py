@@ -21,6 +21,7 @@ def initialize_database(database_path: str | Path) -> None:
     try:
         connection.executescript(schema)
         _ensure_imported_file_status_columns(connection)
+        _ensure_workout_metric_columns(connection)
         connection.commit()
     finally:
         connection.close()
@@ -36,3 +37,23 @@ def _ensure_imported_file_status_columns(connection: sqlite3.Connection) -> None
         )
     if "import_error_message" not in columns:
         connection.execute("ALTER TABLE imported_file ADD COLUMN import_error_message TEXT")
+
+
+def _ensure_workout_metric_columns(connection: sqlite3.Connection) -> None:
+    columns = {row["name"] for row in connection.execute("PRAGMA table_info(workout)")}
+    metric_columns = {
+        "start_time": "TEXT",
+        "end_time": "TEXT",
+        "duration_seconds": "REAL",
+        "distance_meters": "REAL",
+        "calories": "INTEGER",
+        "average_heart_rate": "INTEGER",
+        "max_heart_rate": "INTEGER",
+        "elevation_gain_meters": "REAL",
+        "elevation_loss_meters": "REAL",
+        "external_activity_id": "TEXT",
+    }
+
+    for column_name, column_type in metric_columns.items():
+        if column_name not in columns:
+            connection.execute(f"ALTER TABLE workout ADD COLUMN {column_name} {column_type}")

@@ -30,6 +30,7 @@ class GarminTcxWorkoutData:
     calories: int | None
     average_heart_rate_bpm: int | None
     max_heart_rate_bpm: int | None
+    external_activity_id: str | None
     missing_optional_fields: list[str]
 
 
@@ -59,7 +60,8 @@ def parse_tcx_file(file_path: str | Path) -> GarminTcxWorkoutData:
     if not laps:
         raise GarminTcxImportError("TCX Activity must include at least one Lap.")
 
-    start_timestamp = _first_lap_start_time(laps) or _child_text(activity, "Id")
+    activity_id = _child_text(activity, "Id")
+    start_timestamp = _first_lap_start_time(laps) or activity_id
     if not start_timestamp:
         raise GarminTcxImportError("TCX Activity must include a start time.")
 
@@ -97,6 +99,7 @@ def parse_tcx_file(file_path: str | Path) -> GarminTcxWorkoutData:
         calories=calories,
         average_heart_rate_bpm=average_heart_rate_bpm,
         max_heart_rate_bpm=max_heart_rate_bpm,
+        external_activity_id=activity_id or start_timestamp,
         missing_optional_fields=missing_optional_fields,
     )
 
@@ -133,7 +136,7 @@ def import_garmin_tcx(
         database_path,
         SOURCE,
         workout_data.workout_date,
-        workout_data.start_time,
+        workout_data.start_timestamp,
         workout_data.workout_type,
         workout_data.duration_minutes,
         workout_data.distance_meters,
@@ -155,6 +158,13 @@ def import_garmin_tcx(
             duration_minutes=workout_data.duration_minutes,
             notes=_build_workout_notes(workout_data),
             source=SOURCE,
+            start_time=workout_data.start_timestamp,
+            duration_seconds=workout_data.duration_seconds,
+            distance_meters=workout_data.distance_meters,
+            calories=workout_data.calories,
+            average_heart_rate=workout_data.average_heart_rate_bpm,
+            max_heart_rate=workout_data.max_heart_rate_bpm,
+            external_activity_id=workout_data.external_activity_id,
         ),
     )
 
@@ -211,6 +221,8 @@ def _build_workout_notes(workout_data: GarminTcxWorkoutData) -> str:
         notes.append(f"Average heart rate bpm: {workout_data.average_heart_rate_bpm}")
     if workout_data.max_heart_rate_bpm is not None:
         notes.append(f"Max heart rate bpm: {workout_data.max_heart_rate_bpm}")
+    if workout_data.external_activity_id is not None:
+        notes.append(f"External activity ID: {workout_data.external_activity_id}")
     if workout_data.missing_optional_fields:
         notes.append("Missing optional fields: " + ", ".join(workout_data.missing_optional_fields))
     notes.append("Source metadata: TCX Activity")

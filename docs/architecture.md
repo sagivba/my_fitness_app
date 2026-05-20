@@ -39,6 +39,7 @@ Route handlers should not contain business logic.
 Current web route groups:
 
 - `web.py` renders the home page.
+- `dashboard.py` renders the mini workout metrics dashboard.
 - `workouts.py` handles workout list, create form, create submit, and detail pages.
 - `sleep.py` handles sleep log list, create form, create submit, and detail pages.
 - `daily_logs.py` handles daily log list, create form, create submit, and detail pages.
@@ -65,6 +66,8 @@ Garmin TCX XML parsing, duplicate workout detection, workout creation, and impor
 status updates live in `services/garmin_tcx_import_service.py`.
 Garmin GPX XML parsing, distance calculation, duplicate workout detection, workout
 creation, and import status updates live in `services/garmin_gpx_import_service.py`.
+Mini dashboard aggregation from structured workout fields lives in
+`services/dashboard_service.py`.
 
 ## src/my_fitness_app/model
 
@@ -91,12 +94,26 @@ Raw import file storage currently uses only existing `imported_file` table field
 `created_at`, and `updated_at`. CP07 adds minimal import tracking fields to
 `imported_file`: `import_status` and `import_error_message`.
 
+The workout table stores manual workout fields plus structured Garmin/workout metrics:
+`start_time`, `end_time`, `duration_seconds`, `distance_meters`, `calories`,
+`average_heart_rate`, `max_heart_rate`, `elevation_gain_meters`,
+`elevation_loss_meters`, and `external_activity_id`. The existing `source` field
+identifies manual entries and Garmin import sources.
+
+Because the project does not use a migration framework, fresh databases receive these
+columns through `model/schema.sql`, and existing SQLite databases are hardened by
+idempotent compatibility checks in `model/database.py`. The compatibility logic only
+adds missing nullable columns. It does not drop tables, recreate tables, or rewrite
+existing rows.
+
 Garmin CSV, TCX, and GPX import creates normalized workout records from supported files
 using the existing workout table. Importers set workout `source` to `garmin_csv`,
-`garmin_tcx`, or `garmin_gpx` and store start time, distance, and other parsed metadata
-in deterministic workout notes for duplicate detection without changing the workout
-schema. FIT, Garmin Connect integration, dashboard metrics, analytics, and strength
-training details remain future scope.
+`garmin_tcx`, or `garmin_gpx` and persist parsed metrics structurally where possible.
+Workout notes remain a deterministic, human-readable summary and legacy duplicate
+fallback only; dashboard metrics must not parse notes.
+
+FIT, Garmin Connect integration, advanced analytics, charts, and strength training
+details remain future scope.
 
 ## src/my_fitness_app/utils
 
