@@ -14,6 +14,7 @@ def create_app(config: AppConfig | None = None) -> Flask:
 
     app_config = config or AppConfig.from_env()
     app.config["PROJECT_NAME"] = app_config.project_name
+    app.config["DATABASE_PATH"] = str(app_config.database_path)
 
     app.register_blueprint(web_bp)
     app.register_blueprint(api_bp, url_prefix="/api")

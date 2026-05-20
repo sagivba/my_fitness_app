@@ -18,6 +18,11 @@ Creates and configures the Flask application.
 
 Loads configuration from environment variables.
 
+Current environment-backed settings:
+
+- `PROJECT_NAME`
+- `DATABASE_PATH`, defaulting to `instance/my_fitness_app.db`
+
 ## src/my_fitness_app/routes
 
 HTTP boundary.
@@ -39,6 +44,13 @@ Services should be easy to test with unittest.
 ## src/my_fitness_app/model
 
 Domain models, data structures, and model-facing code.
+
+SQLite persistence foundation:
+
+- `model/database.py` creates SQLite connections and initializes the schema.
+- `model/schema.sql` defines the MVP tables: `daily_log`, `workout`, `sleep_log`,
+  `meal`, and `imported_file`.
+- Route handlers must not call SQLite directly.
 
 ## src/my_fitness_app/utils
 

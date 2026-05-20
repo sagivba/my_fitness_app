@@ -6,9 +6,11 @@ The application is intended to collect and organize personal fitness, sleep, nut
 
 ## Current status
 
-This repository currently contains the initialized Flask foundation for the app.
+This repository currently contains the initialized Flask foundation for the app and a
+minimal SQLite persistence foundation. It does not include user-facing CRUD screens yet.
 
-The first development phase focuses on repository cleanup, package naming, Docker validation, tests, and AI/Codex-friendly project structure.
+The next development phase can build manual data collection features on top of the
+database foundation.
 
 ## Initial scope
 
@@ -26,7 +28,7 @@ The first development phase focuses on repository cleanup, package naming, Docke
 - Python
 - Flask
 - HTML templates
-- SQLite in later stages
+- SQLite local persistence
 - unittest only
 - Docker Compose first workflow
 - WSL + VS Code friendly workflow
@@ -132,6 +134,49 @@ Health endpoint:
 http://127.0.0.1:5000/api/health
 ```
 
+## SQLite persistence
+
+The app reads its database location from `DATABASE_PATH`.
+
+Default:
+
+```text
+instance/my_fitness_app.db
+```
+
+The `instance/` directory is local application data and is not tracked by Git.
+
+The model layer owns database access in:
+
+```text
+src/my_fitness_app/model/database.py
+src/my_fitness_app/model/schema.sql
+```
+
+The initial schema creates these MVP tables:
+
+- `daily_log`
+- `workout`
+- `sleep_log`
+- `meal`
+- `imported_file`
+
+Initialize the configured database in Docker:
+
+```bash
+docker compose \
+  -p my_fitness_app_dev \
+  -f docker-compose.yml \
+  -f docker-compose.dev.yml \
+  run --rm app python3 -c "from my_fitness_app.config import AppConfig; from my_fitness_app.model.database import initialize_database; initialize_database(AppConfig.from_env().database_path)"
+```
+
+To reset the local database, remove the database file and run initialization again:
+
+```bash
+rm -f instance/my_fitness_app.db
+```
+
 ## Codex task plan
 
 The staged Codex tasks are under:
@@ -142,10 +187,4 @@ docs/tasks/
 
 Run them in order. Do not give Codex all tasks at once.
 
-Start with:
-
-```text
-docs/tasks/00_initialize_fitness_app_foundation.md
-```
-
-After this foundation alignment is complete, Task 00 should only verify and finish remaining details.
+Follow `docs/task_order.md` and run one task at a time.

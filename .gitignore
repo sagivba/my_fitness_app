@@ -29,6 +29,9 @@ dist/
 *.log
 logs/
 
+# Local application data
+instance/
+
 # OS / IDE
 .DS_Store
 Thumbs.db
