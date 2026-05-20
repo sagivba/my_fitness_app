@@ -1,75 +1,56 @@
-<!doctype html>
-<html lang="he" dir="rtl">
-<head>
-  <meta charset="utf-8">
-  <title>הוספת רשומה יומית</title>
-  <link rel="stylesheet" href="/static/css/style.css">
-</head>
-<body>
-  <main class="container">
-    <h1>הוספת רשומה יומית</h1>
-    <p><a href="/daily-logs/">חזרה ליומן היומי</a></p>
+{% extends "layout.html" %}
 
-    <form method="post" action="/daily-logs/">
-      <p>
-        <label for="log_date">תאריך</label><br>
-        <input
-          id="log_date"
-          name="log_date"
-          type="date"
-          value="{{ values.get('log_date', '') }}"
-          required
-        >
+{% block title %}הוספת רשומה יומית{% endblock %}
+
+{% block content %}
+  <section class="page-heading">
+    <div>
+      <p class="eyebrow">מדדים יומיים</p>
+      <h1>הוספת רשומה יומית</h1>
+    </div>
+    <div class="actions">
+      <a class="button button--secondary" href="/daily-logs/">חזרה ליומן היומי</a>
+    </div>
+  </section>
+
+  <section class="card">
+    <form class="form" method="post" action="/daily-logs/">
+      <div class="form-group">
+        <label for="log_date">תאריך</label>
+        <input id="log_date" name="log_date" type="date" value="{{ values.get('log_date', '') }}" required>
         {% if errors.get("log_date") %}
           <span class="error">{{ errors["log_date"] }}</span>
         {% endif %}
-      </p>
+      </div>
 
-      <p>
-        <label for="body_weight_kg">משקל בקילוגרמים</label><br>
-        <input
-          id="body_weight_kg"
-          name="body_weight_kg"
-          type="number"
-          min="0.1"
-          step="0.1"
-          value="{{ values.get('body_weight_kg', '') }}"
-        >
-        {% if errors.get("body_weight_kg") %}
-          <span class="error">{{ errors["body_weight_kg"] }}</span>
-        {% endif %}
-      </p>
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="body_weight_kg">משקל בקילוגרמים</label>
+          <input id="body_weight_kg" name="body_weight_kg" type="number" min="0.1" step="0.1" value="{{ values.get('body_weight_kg', '') }}">
+          {% if errors.get("body_weight_kg") %}
+            <span class="error">{{ errors["body_weight_kg"] }}</span>
+          {% endif %}
+        </div>
+        <div class="form-group">
+          <label for="energy_level">רמת אנרגיה</label>
+          <input id="energy_level" name="energy_level" type="number" min="1" value="{{ values.get('energy_level', '') }}">
+          {% if errors.get("energy_level") %}
+            <span class="error">{{ errors["energy_level"] }}</span>
+          {% endif %}
+        </div>
+      </div>
 
-      <p>
-        <label for="mood">מצב רוח</label><br>
-        <input
-          id="mood"
-          name="mood"
-          value="{{ values.get('mood', '') }}"
-        >
-      </p>
+      <div class="form-group">
+        <label for="mood">מצב רוח</label>
+        <input id="mood" name="mood" value="{{ values.get('mood', '') }}">
+      </div>
 
-      <p>
-        <label for="energy_level">רמת אנרגיה</label><br>
-        <input
-          id="energy_level"
-          name="energy_level"
-          type="number"
-          min="1"
-          value="{{ values.get('energy_level', '') }}"
-        >
-        {% if errors.get("energy_level") %}
-          <span class="error">{{ errors["energy_level"] }}</span>
-        {% endif %}
-      </p>
-
-      <p>
-        <label for="notes">הערות</label><br>
+      <div class="form-group">
+        <label for="notes">הערות</label>
         <textarea id="notes" name="notes" rows="4">{{ values.get('notes', '') }}</textarea>
-      </p>
+      </div>
 
       <button type="submit">שמירה</button>
     </form>
-  </main>
-</body>
-</html>
+  </section>
+{% endblock %}

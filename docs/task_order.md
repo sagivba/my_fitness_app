@@ -24,6 +24,7 @@
 ## Phase 4 - Display and summaries
 
 - Task 09: Basic dashboard metrics
+- CP11: UX overhaul and workout intelligence table
 
 ## Phase 5 - AI nutrition
 

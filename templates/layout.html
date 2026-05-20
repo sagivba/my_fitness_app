@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}My Fitness App{% endblock %}</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <header class="app-header">
+    <div class="app-header__inner">
+      <a class="brand" href="/">My Fitness App</a>
+      <nav class="app-nav" aria-label="ניווט ראשי">
+        <a href="/dashboard/">לוח מדדים</a>
+        <a href="/workouts/">אימונים</a>
+        <a href="/sleep/">שינה</a>
+        <a href="/daily-logs/">יומן יומי</a>
+        <a href="/meals/">ארוחות</a>
+        <a href="/imports/">ייבוא</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="page-shell">
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>

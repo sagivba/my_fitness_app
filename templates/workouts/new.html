@@ -1,18 +1,23 @@
-<!doctype html>
-<html lang="he" dir="rtl">
-<head>
-  <meta charset="utf-8">
-  <title>הוספת אימון</title>
-  <link rel="stylesheet" href="/static/css/style.css">
-</head>
-<body>
-  <main class="container">
-    <h1>הוספת אימון</h1>
-    <p><a href="/workouts/">חזרה לאימונים</a></p>
+{% extends "layout.html" %}
 
-    <form method="post" action="/workouts/">
-      <p>
-        <label for="workout_date">תאריך אימון</label><br>
+{% block title %}הוספת אימון{% endblock %}
+
+{% block content %}
+  <section class="page-heading">
+    <div>
+      <p class="eyebrow">אימון ידני</p>
+      <h1>הוספת אימון</h1>
+      <p class="lede">המשך, הסוג וההערות יישמרו כנתונים ידניים. ייבוא Garmin מוסיף מדדים מובנים בנפרד.</p>
+    </div>
+    <div class="actions">
+      <a class="button button--secondary" href="/workouts/">חזרה לאימונים</a>
+    </div>
+  </section>
+
+  <section class="card">
+    <form class="form" method="post" action="/workouts/">
+      <div class="form-group">
+        <label for="workout_date">תאריך אימון</label>
         <input
           id="workout_date"
           name="workout_date"
@@ -23,10 +28,10 @@
         {% if errors.get("workout_date") %}
           <span class="error">{{ errors["workout_date"] }}</span>
         {% endif %}
-      </p>
+      </div>
 
-      <p>
-        <label for="workout_type">סוג אימון</label><br>
+      <div class="form-group">
+        <label for="workout_type">סוג אימון</label>
         <input
           id="workout_type"
           name="workout_type"
@@ -36,10 +41,10 @@
         {% if errors.get("workout_type") %}
           <span class="error">{{ errors["workout_type"] }}</span>
         {% endif %}
-      </p>
+      </div>
 
-      <p>
-        <label for="duration_minutes">משך בדקות</label><br>
+      <div class="form-group">
+        <label for="duration_minutes">משך ידני בדקות</label>
         <input
           id="duration_minutes"
           name="duration_minutes"
@@ -47,18 +52,18 @@
           min="1"
           value="{{ values.get('duration_minutes', '') }}"
         >
+        <span class="field-hint">באימונים מיובאים, משך האימון מגיע מקובץ Garmin כשיש נתון זמין.</span>
         {% if errors.get("duration_minutes") %}
           <span class="error">{{ errors["duration_minutes"] }}</span>
         {% endif %}
-      </p>
+      </div>
 
-      <p>
-        <label for="notes">הערות</label><br>
+      <div class="form-group">
+        <label for="notes">הערות</label>
         <textarea id="notes" name="notes" rows="4">{{ values.get('notes', '') }}</textarea>
-      </p>
+      </div>
 
       <button type="submit">שמירה</button>
     </form>
-  </main>
-</body>
-</html>
+  </section>
+{% endblock %}

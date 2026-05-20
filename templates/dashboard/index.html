@@ -1,90 +1,103 @@
-<!doctype html>
-<html lang="he" dir="rtl">
-<head>
-  <meta charset="utf-8">
-  <title>לוח מדדים</title>
-  <link rel="stylesheet" href="/static/css/style.css">
-</head>
-<body>
-  <main class="container">
-    <h1>לוח מדדים</h1>
-    <p><a href="/">דף הבית</a></p>
+{% extends "layout.html" %}
 
-    <section>
-      <h2>סיכום אימונים</h2>
-      <dl>
-        <dt>מספר אימונים</dt>
-        <dd>{{ summary.total_workouts }}</dd>
+{% block title %}לוח מדדים{% endblock %}
 
-        <dt>משך כולל</dt>
-        <dd>{{ summary.total_duration_minutes }} דקות</dd>
+{% block content %}
+  <section class="page-heading">
+    <div>
+      <p class="eyebrow">סיכום מובנה</p>
+      <h1>לוח מדדים</h1>
+      <p class="lede">מדדים מחושבים משדות אימון מובנים בלבד, ללא קריאת הערות חופשיות.</p>
+    </div>
+    <div class="actions">
+      <a class="button" href="/workouts/">טבלת אימונים</a>
+    </div>
+  </section>
 
-        <dt>מרחק כולל</dt>
-        <dd>{{ "%.2f"|format(summary.total_distance_km) }} ק"מ</dd>
+  <section class="metric-grid metric-grid--dashboard">
+    <div>
+      <dt>מספר אימונים</dt>
+      <dd>{{ summary.total_workouts }}</dd>
+    </div>
+    <div>
+      <dt>משך כולל</dt>
+      <dd>{{ summary.total_duration_minutes }} דק׳</dd>
+    </div>
+    <div>
+      <dt>מרחק כולל</dt>
+      <dd>{{ "%.2f"|format(summary.total_distance_km) }} ק״מ</dd>
+    </div>
+    <div>
+      <dt>קלוריות</dt>
+      <dd>{{ summary.total_calories }}</dd>
+    </div>
+    <div>
+      <dt>דופק ממוצע</dt>
+      <dd>{{ summary.average_heart_rate or "-" }}</dd>
+    </div>
+    <div>
+      <dt>דופק מרבי</dt>
+      <dd>{{ summary.max_heart_rate or "-" }}</dd>
+    </div>
+  </section>
 
-        <dt>קלוריות</dt>
-        <dd>{{ summary.total_calories }}</dd>
-
-        {% if summary.average_heart_rate %}
-          <dt>דופק ממוצע</dt>
-          <dd>{{ summary.average_heart_rate }}</dd>
-        {% endif %}
-
-        {% if summary.max_heart_rate %}
-          <dt>דופק מרבי</dt>
-          <dd>{{ summary.max_heart_rate }}</dd>
-        {% endif %}
-      </dl>
-    </section>
-
-    <section>
+  <section class="section-grid">
+    <article class="card">
       <h2>אימונים אחרונים</h2>
       {% if summary.recent_workouts %}
-        <ul>
-          {% for workout in summary.recent_workouts %}
-            <li>
-              <a href="/workouts/{{ workout.id }}">
-                {{ workout.workout_date }} - {{ workout.workout_type }}
-              </a>
-              {% if workout.distance_meters %}
-                <span>{{ "%.2f"|format(workout.distance_meters / 1000) }} ק"מ</span>
-              {% endif %}
-              {% if workout.duration_minutes %}
-                <span>{{ workout.duration_minutes }} דקות</span>
-              {% endif %}
-            </li>
-          {% endfor %}
-        </ul>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>תאריך</th>
+                <th>סוג</th>
+                <th>מקור</th>
+                <th>משך</th>
+                <th>מרחק</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for workout in summary.recent_workouts %}
+                <tr>
+                  <td><a href="/workouts/{{ workout.id }}">{{ workout.workout_date }}</a></td>
+                  <td>{{ workout.workout_type }}</td>
+                  <td>{{ workout.source }}</td>
+                  <td>{{ workout.duration }}</td>
+                  <td>{{ workout.distance }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
       {% else %}
-        <p>עדיין אין אימונים להצגה.</p>
+        <p class="empty-inline">עדיין אין אימונים להצגה.</p>
       {% endif %}
-    </section>
+    </article>
 
-    <section>
+    <article class="card">
       <h2>לפי מקור</h2>
       {% if summary.source_breakdown %}
-        <ul>
+        <ul class="summary-list">
           {% for item in summary.source_breakdown %}
-            <li>{{ item.label }}: {{ item.count }}</li>
+            <li><span>{{ item.label }}</span><strong>{{ item.count }}</strong></li>
           {% endfor %}
         </ul>
       {% else %}
-        <p>אין נתונים.</p>
+        <p class="empty-inline">אין נתונים.</p>
       {% endif %}
-    </section>
+    </article>
 
-    <section>
+    <article class="card">
       <h2>לפי סוג אימון</h2>
       {% if summary.workout_type_breakdown %}
-        <ul>
+        <ul class="summary-list">
           {% for item in summary.workout_type_breakdown %}
-            <li>{{ item.label }}: {{ item.count }}</li>
+            <li><span>{{ item.label }}</span><strong>{{ item.count }}</strong></li>
           {% endfor %}
         </ul>
       {% else %}
-        <p>אין נתונים.</p>
+        <p class="empty-inline">אין נתונים.</p>
       {% endif %}
-    </section>
-  </main>
-</body>
-</html>
+    </article>
+  </section>
+{% endblock %}

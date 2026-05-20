@@ -50,5 +50,6 @@ class TestDashboardRoutes(TestCase):
         self.assertIn("לוח מדדים".encode(), response.data)
         self.assertIn("מספר אימונים".encode(), response.data)
         self.assertIn("מרחק כולל".encode(), response.data)
+        self.assertIn("טבלת אימונים".encode(), response.data)
         self.assertIn(b"6.20", response.data)
-        self.assertIn(b"garmin_tcx", response.data)
+        self.assertIn(b"Garmin TCX", response.data)

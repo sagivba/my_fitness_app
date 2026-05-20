@@ -13,8 +13,9 @@ storage, and Garmin CSV/TCX/GPX import paths.
 
 The Garmin import foundation stores raw files and can import documented CSV, TCX, and
 GPX formats into workout records. Supported Garmin metadata is persisted in structured
-workout fields where possible and powers a small workout metrics dashboard. The app
-does not parse FIT files and does not provide advanced analytics.
+workout fields where possible and powers a workout intelligence table plus a small
+metrics dashboard. The app does not parse FIT files and does not provide advanced
+analytics.
 
 ## Initial scope
 
@@ -145,9 +146,15 @@ http://127.0.0.1:5000/workouts/
 http://127.0.0.1:5000/workouts/new
 ```
 
-Workout detail pages include an `אימון כוח` section for adding strength sets.
-Strength entries are stored as exercises linked to a workout, with one or more sets
-per exercise. Totals show exercise count, set count, rep count, and weighted volume.
+The workout list is a Hebrew RTL intelligence table. It displays date, structured
+start time, type, source, duration, distance, calories, heart-rate metrics, strength
+summary, and a details action. Missing values are shown as `-`. Garmin and dashboard
+metrics use structured workout columns only and do not parse free-text notes.
+
+Workout detail pages are organized into basic details, structured Garmin metrics,
+strength details, notes, and source/import information. Strength entries are stored as
+exercises linked to a workout, with one or more sets per exercise. Totals show
+exercise count, set count, rep count, and weighted volume.
 
 Workout metrics dashboard:
 
